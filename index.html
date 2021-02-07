@@ -40,15 +40,28 @@
     <link rel="stylesheet" href="./src/css/bootleaf.css">
 
     <!-- optional libraries - comment out any libraries which are not being used to improve page load times -->
-    <link rel="stylesheet"
+    <!-- <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.1.0/MarkerCluster.Default.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.1.0/MarkerCluster.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.1.0/MarkerCluster.css"> -->
     <link rel="stylesheet" href="./src/plugins/geocoders/Control.Geocoder.css"/>
     <link rel="stylesheet" href="./src/plugins/bookmarks/leaflet.bookmarks.css"/>
-    <link rel="stylesheet" href="./src/plugins/leaflet-history/leaflet-history.css"/>
+    <!-- <link rel="stylesheet" href="./src/plugins/leaflet-history/leaflet-history.css"/> -->
 
     <!-- Customise the styles used in this map -->
     <link rel="stylesheet" href="style.css">
+
+
+
+
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.min.js"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.16.0/d3.js"></script>
+
+    <!-- <script src="skewt/skewt.min.js"  charset="UTF-8"></script> -->
+    <script src="skewt/atmosphere.js"  charset="UTF-8"></script>
+    <script src="skewt/math.js"  charset="UTF-8"></script>
+    <script src="skewt/skewt.js"  charset="UTF-8"></script>
+    <link rel="stylesheet" type="text/css" href="skewt/skewt.css">
+
 
     <!-- favicons -->
     <link rel="apple-touch-icon" sizes="76x76" href="./src/img/favicon-76.png">
@@ -62,8 +75,8 @@
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
 
-    <a class="navbar-brand" href="https://bootleaf.xyz">
-        Bootleaf homepage
+    <a class="navbar-brand" href="https://radiosonde.mah.priv.at">
+        Radiosonde
     </a>
 
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
@@ -130,7 +143,7 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div id="sidebarContents" class="col-xs-12 col-md-12">
+                          <div id="sidebarContents" class="col-xs-12 col-md-12"  style="    width: 400px">
                             <!-- contents are inserted programatically by the current active tool -->
                         </div>
                     </div>
@@ -159,26 +172,6 @@
         </div>
     </div>
 </div>
-
-<div class="modal fade" id="loginModal" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Login to ArcGIS</h5>
-            </div>
-            <div class="modal-body">
-                <form class="form-signin">
-                  <label for="username" class="sr-only">Email address</label>
-                  <input type="text" id="username" class="form-control" placeholder="ArcGIS username" required="" autofocus="">
-                  <label for="password" class="sr-only">Password</label>
-                  <input type="password" id="password" class="form-control" placeholder="Password" required="">
-
-                  <button id="btnArcGISOnline" class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
-                </form>
-            </div>
-        </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
 
 
 <div class="modal fade" id="aboutModal" tabindex="-1" role="dialog">
@@ -306,45 +299,48 @@
 <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
   integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
   crossorigin=""></script>
-<script src="https://unpkg.com/esri-leaflet@2.5.0/dist/esri-leaflet.js"
+<!-- <script src="https://unpkg.com/esri-leaflet@2.5.0/dist/esri-leaflet.js"
     integrity="sha512-ucw7Grpc+iEQZa711gcjgMBnmd9qju1CICsRaryvX7HJklK0pGl/prxKvtHwpgm5ZHdvAil7YPxI1oWPOWK3UQ=="
-    crossorigin=""></script>
+    crossorigin=""></script> -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.2/leaflet.draw.js"></script>
-<script src="https://unpkg.com/esri-leaflet-renderers@2.1.2/dist/esri-leaflet-renderers.js"
+<!-- <script src="https://unpkg.com/esri-leaflet-renderers@2.1.2/dist/esri-leaflet-renderers.js"
     integrity="sha512-/McnqdlwYvfeOEWqoniEagFRQnLi/TNbkHe4EJypmZI02LBT7vBU/+PZ5W3FSsFFlRbnMCsJvnbp5MX8XOBrnQ=="
-    crossorigin=""></script>
+    crossorigin=""></script> -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.min.js"></script>
 
 <!-- Plugins. Comment out any unused libaries to improve the page load times -->
-<script src="./src/plugins/bing/leaflet-bing-layer.min.js"></script>
+<!-- <script src="./src/plugins/bing/leaflet-bing-layer.min.js"></script> -->
 <script src="./src/plugins/geocoders/Control.Geocoder.js"></script>
 <script src="./src/plugins/geocoders/Control.Geocoder.harmony.js"></script>
-<script src="./src/plugins/leaflet-history/leaflet-history.js"></script>
-<script src="./src/plugins/leaflet-groupedlayercontrol/leaflet.groupedlayercontrol.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.1.0/leaflet.markercluster.js"></script>
-<script src="https://unpkg.com/esri-leaflet-cluster@2.1.0/dist/esri-leaflet-cluster.js"
+<!-- <script src="./src/plugins/leaflet-history/leaflet-history.js"></script> -->
+<!-- <script src="./src/plugins/leaflet-groupedlayercontrol/leaflet.groupedlayercontrol.js"></script> -->
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.1.0/leaflet.markercluster.js"></script> -->
+<!-- <script src="https://unpkg.com/esri-leaflet-cluster@2.1.0/dist/esri-leaflet-cluster.js"
     integrity="sha512-fEdNFHisleVtEYdLhW4Z2RsR7TN6hLutE/+O4D+skfTNY2rlHm8HOZARPWkdrFFy/+i2KjFxcZAKTUWaVfbV0g=="
-    crossorigin=""></script>
+    crossorigin=""></script> -->
 <script src="./src/plugins/bookmarks/Leaflet.Bookmarks.js"></script>
-<script src="./src/plugins/WFST/Leaflet-WFST.min.js"></script>
+<!-- <script src="./src/plugins/WFST/Leaflet-WFST.min.js"></script>
 <script src="./src/plugins/datatables/datatables.min.js"></script>
 <script src="./src/plugins/datatables/buttons.html5.min.js"></script>
 <script src="./src/plugins/datatables/dataTables.buttons.min.js"></script>
 <script src="./src/plugins/datatables/buttons.bootstrap.min.js"></script>
-<script src="./src/plugins/moment/moment.js"></script>
+<script src="./src/plugins/moment/moment.js"></script> -->
 <script src="./src/plugins/proj4js/proj4.js"></script>
 <script src="./src/plugins/proj4js/proj4leaflet.js"></script>
 <script src="./src/plugins/growl/javascripts/jquery.growl.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/2.1.0/chroma.min.js" crossorigin="anonymous"></script>
 
 <!-- this app's code -->
+
 <script src="./src/js/app.js"></script>
 <script src="./src/js/listeners.js"></script>
+
 
 <!-- optional - custom functionality -->
 <script src="custom.js"></script>
 
 <!-- the configuration file holding this app's customisations -->
-<script src="config.js"></script>
+<script  src="config.js"></script>
 
 </body>
 </html>
