@@ -1,5 +1,5 @@
 var config = {
-    "title": "Radiosondes for the rest of us!",
+    "title": "Radiosonde", // tab  name
     "start": {
         // "maxZoom": 16,
         "center": [47, 15],
