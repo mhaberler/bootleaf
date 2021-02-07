@@ -1,3 +1,7 @@
+import SkewT from "./skewt/skewt.js";
+
+
+
 var datapath = 'https://radiosonde.mah.priv.at/data-dev/';
 var summary = datapath + 'summary.geojson';
 
