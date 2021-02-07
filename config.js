@@ -9,7 +9,7 @@ var config = {
     },
     "about": {
         "title": "Radiosonde ascents for the masses!",
-        "contents": "<p>Michael Haberler's anti-brainrot lockdown project.</p>"
+        "contents": "<p>see https://github.com/mhaberler/radiosonde</p>" 
     },
     "controls": {
         "zoom": {
