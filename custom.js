@@ -214,7 +214,7 @@ function beforeMapLoads() {
         }).addTo(bootleaf.map);
     });
 }
-
+//XXX
 
 function afterMapLoads() {
     // This function is run after the map has loaded. It gives access to bootleaf.map, bootleaf.TOCcontrol, etc
