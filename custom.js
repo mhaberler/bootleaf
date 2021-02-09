@@ -118,7 +118,7 @@ function loadAscent(url, ascent, completion) {
 // toJSON: 2021-02-09T15:54:08.639Z
 function timeString(unxiTimestamp) {
     var ts = new Date(unxiTimestamp * 1000).toJSON();
-    return ts.substring(0,10) + ' ' + ts.substring(11,16) + 'Z';
+    return ts.substring(0, 10) + ' ' + ts.substring(11, 16) + 'Z';
 }
 
 function plotStation(feature, index) {
@@ -128,15 +128,29 @@ function plotStation(feature, index) {
     var text = feature.properties.name;
     $('#sidebarTitle').html(text);
 
+    // Create anchor element.
+    var a = document.createElement('a');
+    // Create the text node for anchor element.
+    var link = document.createTextNode("station " + ascent.station_id);
+    // Append the text node to anchor element.
+    a.appendChild(link);
+    // Set the title.
+    a.title = "station " + ascent.station_id;
+
+    // Set the href property.
+    a.href = "https://radiosonde.mah.priv.at/dev/?station=" + ascent.station_id;
+    $('#sidebarSubTitle').html(a);
+
     $('#box1').html(timeString(syntime));
-//    $('#box2').html("id: " + ascent.station_id);
+    //    $('#box2').html("id: " + ascent.station_id);
     if (ascent.source === "BUFR") {
 
         $('#box2').html("source: DWD");
-    } else {
+    }
+    else {
         $('#box2').html("source: MADIS");
     }
-//    $('#sidebarBottom').html(timeString(syntime));
+    //    $('#sidebarBottom').html(timeString(syntime));
 
     if (!ascent.hasOwnProperty('data')) {
         var p = datapath + ascent.path;
@@ -176,70 +190,69 @@ function gotSummary(data) {
     console.log("gotSummary", data);
     summary = data;
     markers = L.geoJson(data, {
-            filter: function(f) {
-                if (!f.properties.ascents.length) // no ascents available
-                    return false;
-                if (saveMemory) {
-                    // delete attrs
-                    delete f.origin_member;
-                    delete f.origin_archive;
-                }
-                stations[f.properties.ascents[0].station_id] = f;
-                return true;
-            },
-            pointToLayer: function(feature, latlng) {
-                let now = Math.floor(Date.now() / 1000);
-                let ascents = feature.properties.ascents;
-
-                // prefer BUFR over netCDF
-                // ascents are sorted descending by syn_timestamp
-                // both netCDF either/or BUFR-derived ascents with same syn_timestamp
-                // may be present.
-                // BUFR-derived ascents are better quality data so prefer them.
-                // we keep the netCDF-derived ascents of same timestamp around
-                // to check how good the trajectory simulation is
-                var newest_bufr = ascents.find(findBUFR);
-                var newest_netcdf = ascents.find(findnetCDF);
-                if (!newest_bufr && !newest_netcdf)
-                    return;
-
-                var a;
-                if (newest_bufr && newest_netcdf &&
-                    (newest_bufr.syn_timestamp) ==
-                    (newest_netcdf.syn_timestamp)) {
-                    a = [newest_bufr, newest_netcdf];
-                }
-                else {
-                    if (newest_bufr)
-                        a = [newest_bufr];
-                    else
-                        a = [newest_netcdf];
-                }
-                var primary = a[0];
-                var ts = primary.syn_timestamp;
-
-                var age_hrs = (now - ts) / 3600;
-                var age_index = Math.round(Math.min(age_hrs, maxHrs - 1));
-                age_index = Math.max(age_index, 0);
-                var rounded_age = Math.round(age_hrs * 10) / 10;
-                geojsonMarkerOptions.fillColor = marker_chroma[primary.source](age_index / maxHrs);
-                var marker = L.circleMarker(latlng, geojsonMarkerOptions);
-
-                var content = "<b>" + feature.properties.name + "</b>" + "<br>  " + rounded_age + " hours old";
-                if (isTouchDevice) {
-                    marker.on('click', clicked);
-                }
-                else {
-                    marker.bindTooltip(content, {
-                            className: primary.source + 'CSSClass'
-                        }).openTooltip()
-                        .on('click', clicked);
-                    //                        .on('mouseover', mouseover);
-                }
-                return marker;
+        filter: function(f) {
+            if (!f.properties.ascents.length) // no ascents available
+                return false;
+            if (saveMemory) {
+                // delete attrs
+                delete f.origin_member;
+                delete f.origin_archive;
             }
+            stations[f.properties.ascents[0].station_id] = f;
+            return true;
+        },
+        pointToLayer: function(feature, latlng) {
+            let now = Math.floor(Date.now() / 1000);
+            let ascents = feature.properties.ascents;
+
+            // prefer BUFR over netCDF
+            // ascents are sorted descending by syn_timestamp
+            // both netCDF either/or BUFR-derived ascents with same syn_timestamp
+            // may be present.
+            // BUFR-derived ascents are better quality data so prefer them.
+            // we keep the netCDF-derived ascents of same timestamp around
+            // to check how good the trajectory simulation is
+            var newest_bufr = ascents.find(findBUFR);
+            var newest_netcdf = ascents.find(findnetCDF);
+            if (!newest_bufr && !newest_netcdf)
+                return;
+
+            var a;
+            if (newest_bufr && newest_netcdf &&
+                (newest_bufr.syn_timestamp) ==
+                (newest_netcdf.syn_timestamp)) {
+                a = [newest_bufr, newest_netcdf];
+            }
+            else {
+                if (newest_bufr)
+                    a = [newest_bufr];
+                else
+                    a = [newest_netcdf];
+            }
+            var primary = a[0];
+            var ts = primary.syn_timestamp;
+
+            var age_hrs = (now - ts) / 3600;
+            var age_index = Math.round(Math.min(age_hrs, maxHrs - 1));
+            age_index = Math.max(age_index, 0);
+            var rounded_age = Math.round(age_hrs * 10) / 10;
+            geojsonMarkerOptions.fillColor = marker_chroma[primary.source](age_index / maxHrs);
+            var marker = L.circleMarker(latlng, geojsonMarkerOptions);
+
+            var content = "<b>" + feature.properties.name + "</b>" + "<br>  " + rounded_age + " hours old";
+            if (isTouchDevice) {
+                marker.on('click', clicked);
+            }
+            else {
+                marker.bindTooltip(content, {
+                        className: primary.source + 'CSSClass'
+                    }).openTooltip()
+                    .on('click', clicked);
+                //                        .on('mouseover', mouseover);
+            }
+            return marker;
         }
-    ).addTo(bootleaf.map);
+    }).addTo(bootleaf.map);
     var station = getURLParameter("station");
     if (station) {
         f = stations[station];
@@ -278,11 +291,11 @@ function beforeMapLoads() {
 }
 
 var createDelayManager = function() {
-  var timer = 0;
-  return function(callback, ms, e) {
-     clearTimeout(timer);
-     timer = setTimeout(callback, ms, e);
-  };
+    var timer = 0;
+    return function(callback, ms, e) {
+        clearTimeout(timer);
+        timer = setTimeout(callback, ms, e);
+    };
 }
 var fadeoutManager = createDelayManager();
 
