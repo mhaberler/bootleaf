@@ -21,6 +21,8 @@ var SkewT = function(div) {
     var tan = Math.tan((gradient || 55) *deg2rad);
     var basep = 1000;
     var topp = 100;
+    var steph = 1000;
+
     var plines = [1000,900,800,700,600,500,400,300,200,100];
     var pticks = [950,900,800,750,650,600,550,450,400,350,250,150];
     var barbsize = 15;   /////
@@ -344,6 +346,11 @@ var SkewT = function(div) {
 
     var clearBg = function(){
         skewtbg.selectAll("*").remove();
+    }
+
+    var setParams = function(p){
+        ({ topp=topp, basep=basep, steph=steph, gradient=gradient} = p);
+
     }
 
 
