@@ -1,8 +1,9 @@
 var datapath = 'https://radiosonde.mah.priv.at/data-dev/';
-var summary = datapath + 'summary.geojson';
+var summary_url = datapath + 'summary.geojson';
 
 var geojsonMarkerOptions = {
-    radius: 8,
+    radius: 10,
+    //    radius: 5000,
     color: "#000",
     weight: 1,
     opacity: 1,
@@ -22,18 +23,6 @@ var path_colors = {
     "origin": {
         color: 'MediumBlue'
     }
-}
-
-function drawpath(geojson) {
-    var path_source = geojson.properties.path_source;
-    var lineCoordinate = [];
-
-    for (var i in geojson.features) {
-        var pointJson = geojson.features[i];
-        var coord = pointJson.geometry.coordinates;
-        lineCoordinate.push([coord[1], coord[0]]);
-    }
-    L.polyline(lineCoordinate, path_colors[path_source]).addTo(bootleaf.map);
 }
 
 function uv2speed(u, v) {
@@ -81,18 +70,19 @@ function plotSkewT(geojson) {
     $("#sidebar").show("slow");
 }
 
-function loadAscent(l, p, index, completion) {
-    $.getJSON(p,
-        (function(site) {
-            return function(geojson) {
-                site.target.feature.properties.ascents[site.index].data = geojson;
-                completion(geojson);
-            };
-        }(l))
-    );
-}
-
 let drawAscents = 1;
+
+function drawpath(feature) {
+    var path_source = feature.properties.path_source;
+    var lineCoordinate = [];
+
+    for (var i in feature.features) {
+        var pointJson = feature.features[i];
+        var coord = pointJson.geometry.coordinates;
+        lineCoordinate.push([coord[1], coord[0]]);
+    }
+    L.polyline(lineCoordinate, path_colors[path_source]).addTo(bootleaf.map);
+}
 
 function mouseover(l) {
     var ascents = l.target.feature.properties.ascents;
@@ -107,29 +97,40 @@ function mouseover(l) {
             l.index = i;
             loadAscent(l, p, i, drawpath);
         }
-        // else {
-        //     console.log("data for ", i, "already loaded:", a.data);
-        // }
     }
 }
 
 var skewt = new SkewT('#sidebarContents');
 
-console.log(skewt);
 
-function clicked(l) {
+function loadAscent(url, ascent, completion) {
+    $.getJSON(url,
+        (function(a) {
+            return function(geojson) {
+                a.data = geojson;
+                completion(geojson);
+                drawpath(geojson);
+            };
+        }(ascent))
+    );
+}
 
-    $('#sidebarTitle').html(l.target.feature.properties.name);
+function plotStation(feature) {
+    $('#sidebarTitle').html(feature.properties.name);
 
-    var latest = l.target.feature.properties.ascents[0];
+    console.log("plotStation feature=", feature);
+    var latest = feature.properties.ascents[0];
     if (!latest.hasOwnProperty('data')) {
-        console.log("data for ", latest, "not yet loaded");
-
+        var p = datapath + latest.path;
+        loadAscent(p, latest, plotSkewT);
     }
     else {
         plotSkewT(latest.data);
     }
+}
 
+function clicked(l) {
+    plotStation(l.target.feature);
 }
 
 function findBUFR(value, index, array) {
@@ -148,15 +149,26 @@ function _isTouchDevice() {
 
 var isTouchDevice = _isTouchDevice();
 
-function beforeMapLoads() {
-    console.log("Before map loads function");
+var summary = null;
+var markers = null;
+var saveMemory = isTouchDevice;
+var stations = {}; // features indexed by station_id
 
-    // Continue to load the map
-    loadMap();
-
-    $.getJSON(summary, function(data) {
-        L.geoJson(data, {
-
+function gotSummary(data) {
+    console.log("gotSummary", data);
+    summary = data;
+    markers = L.geoJson(data, {
+            filter: function(f) {
+                if (!f.properties.ascents.length) // no ascents available
+                    return false;
+                if (saveMemory) {
+                    // delete attrs
+                    delete f.origin_member;
+                    delete f.origin_archive;
+                }
+                stations[f.properties.ascents[0].station_id] = f;
+                return true;
+            },
             pointToLayer: function(feature, latlng) {
                 let now = Math.floor(Date.now() / 1000);
                 let ascents = feature.properties.ascents;
@@ -196,28 +208,154 @@ function beforeMapLoads() {
                 // geojsonMarkerOptions.fillColor = marker_shades[primary.source].get(age_index).getHex();
                 geojsonMarkerOptions.fillColor = marker_chroma[primary.source](age_index / maxHrs);
 
+                //var marker = L.circle(latlng, geojsonMarkerOptions);
                 var marker = L.circleMarker(latlng, geojsonMarkerOptions);
+
+                // marker._orgRadius = marker.getRadius();
+                // marker.setRadius(calcRadius(marker._orgRadius, bootleaf.map.getZoom()))
+
+
                 //marker.ascents = a;
                 var content = "<b>" + feature.properties.name + "</b>" + "<br>  " + rounded_age + " hours old";
 
-                console.log("isTouchDevice", isTouchDevice);
+                //console.log("isTouchDevice", isTouchDevice);
 
-                // console.log(primary.source + 'CSSClass');
-                marker.bindTooltip(content, {
-                        className: primary.source + 'CSSClass'
-                    }).openTooltip()
-                    .on('click', clicked)
-                    .on('mouseover', mouseover);
+
+
+                if (isTouchDevice) {
+                    marker.on('click', clicked);
+                }
+                else {
+                    marker.bindTooltip(content, {
+                            className: primary.source + 'CSSClass'
+                        }).openTooltip()
+                        .on('click', clicked);
+                    //                        .on('mouseover', mouseover);
+                }
 
                 return marker;
             }
-        }).addTo(bootleaf.map);
-    });
+
+        }
+
+    ).addTo(bootleaf.map);
+    var station = getURLParameter("station");
+    if (station) {
+        f = stations[station];
+        if (!f) {
+            $.growl.error({
+                message: "no such station: " + station
+            });
+        }
+        else {
+            plotStation(f);
+        }
+    }
 }
 
+function failedSummary(jqXHR, textStatus, err) {
+    console.log("failedSummary", textStatus, err);
+}
+
+
+function addStations() {
+    $.getJSON(summary_url)
+        .done(function(data) {
+            gotSummary(data);
+        })
+        .fail(function(jqXHR, textStatus, err) {
+            failedSummary(jqXHR, textStatus, err);
+        });
+
+}
+
+
+function beforeMapLoads() {
+    console.log("Before map loads function");
+
+    // Continue to load the map
+    loadMap();
+    addStations();
+}
+
+var createDelayManager = function() {
+  var timer = 0;
+  return function(callback, ms, e) {
+     clearTimeout(timer);
+     timer = setTimeout(callback, ms, e);
+  };
+}
+var fadeoutManager = createDelayManager();
+
+function closeBookmark(e) {
+    $(".leaflet-popup-close-button")[0].click();
+}
+var bookmarkLife = 2000;
 
 function afterMapLoads() {
     // This function is run after the map has loaded. It gives access to bootleaf.map, bootleaf.TOCcontrol, etc
 
     console.log("After map loads function");
+
+    bootleaf.map.on('bookmark:show', function(e) {
+        fadeoutManager(closeBookmark, bookmarkLife, e);
+    });
+    // bootleaf.map.on('zoomend' , function (e) {
+    //     var geo = bootleaf.map.getCenter();
+    //     var n = countVisibleMarkers(bootleaf.map);
+    //
+    //     console.log(bootleaf.map.getZoom(), n);
+    //     // if (L.getZoom()>14)
+    //     // {
+    //     //     marker.setLatLng(geo);
+    //     //     marker.addTo(L);
+    //     // }else {
+    //     //     marker.remove();
+    //     // }
+    // });
+
+
+
+    // bootleaf.map.on('zoomend', function() {
+    //     markers.eachLayer(function(layer) {
+    //         if (layer instanceof L.CircleMarker) {
+    //             console.log('#####')
+    //             console.log(layer.getRadius())
+    //             layer.setRadius(calcRadius(layer._orgRadius, bootleaf.map.getZoom()))
+    //             console.log(layer.getRadius())
+    //         }
+    //     });
+    // });
 }
+
+
+// Scale circle markers by using the zoom value
+// you need to know what the min value is,
+// calculated at runtime or prior
+var minValue = 1;
+
+function calcRadius(val, zoom) {
+    return 1.00083 * Math.pow(val / minValue, 0.5716) * (zoom / 2);
+}
+
+
+
+// this._layer.eachLayer(function(layer) {
+//         if(layer instanceof L.Marker)
+//             if( that._map.getBounds().contains(layer.getLatLng()) )
+//                 if(++n < that.options.maxItems)
+//                     that._list.appendChild( that._createItem(layer) );
+//     });
+//
+// function countVisibleMarkers(map) {
+//     var bounds = map.getBounds();
+//     var count = 0;
+//
+//     map.eachLayer(function(layer) {
+// //        console.log("layer=", typeof layer);
+//         if (layer instanceof L.circleMarker) {
+//             if (bounds.contains(layer.getLatLng())) count++;
+//         }
+//     });
+//     return count;
+// }
