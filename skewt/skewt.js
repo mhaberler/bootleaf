@@ -315,11 +315,16 @@ var SkewT = function(div) {
                 .attr("d", tempdewline);
         }
 
-
-
         //barbs stuff
+        var stepH = 500;
         var lastH=-500;
-        var barbs = skewtline.filter(function(d) {  if (d.hght>lastH+1500) lastH=d.hght; return (d.hght==lastH && d.wdir >= 0 && d.wspd >= 0 && d.press >= topp); });
+        var barbs = skewtline.filter(function(d) {
+            if (d.hght > lastH) {
+                var result =  (d.hght > lastH && d.wdir >= 0 && d.wspd >= 0 && d.press >= topp);
+                lastH = lastH + stepH;
+                console.log( d.press, d.hght, lastH, d.hght > lastH );
+                return result;
+            }});
         var allbarbs = barbgroup.selectAll("barbs")
             .data(barbs).enter().append("use")
             .attr("xlink:href", function (d) { return "#barb"+Math.round(convert(d.wspd, "kt")/5)*5; }) // 0,5,10,15,... always in kt
