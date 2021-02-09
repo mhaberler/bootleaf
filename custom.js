@@ -268,7 +268,7 @@ function addStations() {
         });
 
 }
-
+//XXX
 
 function beforeMapLoads() {
     console.log("Before map loads function");
