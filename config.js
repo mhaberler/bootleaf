@@ -9,7 +9,7 @@ var config = {
     },
     "about": {
         "title": "Radiosonde ascents for the masses!",
-        "contents": "<p>see https://github.com/mhaberler/radiosonde</p>" 
+        "contents": "<p>see https://github.com/mhaberler/radiosonde</p>"
     },
     "controls": {
         "zoom": {
@@ -22,35 +22,146 @@ var config = {
             "placeholder": "Search for a location",
             "type": "OpenStreetMap",
         },
-
+        "TOC": {
+            //https://leafletjs.com/reference-1.0.2.html#control-layers-option
+            "collapsed": true,
+            "uncategorisedLabel": "Layers",
+            "position": "topright",
+            "toggleAll": true
+        },
         "bookmarks": {
             "position": "bottomright",
             "places": [{
-                "latlng": [
-                    46.991, 15.437
-                ],
-                "zoom": 12,
-                "name": "Graz-Thalerhof",
-                "id": "a148fa354ba3",
-                "editable": true,
-                "removable": true
-            }]
+                    "latlng": [
+                        46.56, 13.0
+                    ],
+                    "zoom": 7,
+                    "name": "Alps",
+                    "id": "alps4711",
+                    "editable": true,
+                    "removable": true
+                },
+                {
+                    "latlng": [
+                        47.5, 13.6
+                    ],
+                    "zoom": 8,
+                    "name": "Austria",
+                    "id": "austria4711",
+                    "editable": true,
+                    "removable": true
+                },
+                {
+                    "latlng": [
+                        -29.17,24.27
+                    ],
+                    "zoom": 6,
+                    "name": "South Africa",
+                    "id": "sa4711",
+                    "editable": true,
+                    "removable": true
+                },
+                 {
+                    "latlng": [
+                        50.2,11.22
+                    ],
+                    "zoom": 6,
+                    "name": "Central Europe",
+                    "id": "ce4711",
+                    "editable": true,
+                    "removable": true
+                },
+                {
+                   "latlng": [
+                       63.6,18.1
+                   ],
+                   "zoom": 5,
+                   "name": "Scandinavia",
+                   "id": "sc4711",
+                   "editable": true,
+                   "removable": true
+               },
+                {
+                   "latlng": [
+                       41.282,-90.54
+                   ],
+                   "zoom": 4,
+                   "name": "The Colonies",
+                   "id": "colonies4711",
+                   "editable": true,
+                   "removable": true
+               },
+               {
+                  "latlng": [
+                      -71.76,120.72
+                  ],
+                  "zoom": 3,
+                  "name": "Antarctica",
+                  "id": "aa4711",
+                  "editable": true,
+                  "removable": true
+              },
+              {
+                 "latlng": [
+                     11.826, 129.63
+                 ],
+                 "zoom": 6,
+                 "name": "Philippines",
+                 "id": "pp4711",
+                 "editable": true,
+                 "removable": true
+             }
+
+
+            ]
         }
     },
 
-    "activeTool": "filterWidget", // options are identify/coordinates/queryWidget
-    "basemaps": [
-		 'OpenStreetMap',
-	  ],
+    // "activeTool": "filterWidget", // options are identify/coordinates/queryWidget
+    "basemaps": ['OpenStreetMap', 'Aerial'],
+    "bing_key": "Ai97yaqNocJJDGpibB4EnQ-0AoEb0prY4jZ3OASp8rf8jHFET_KsVtgGx2MDku6F",
 
-    "tocCategories": [
+    "tocCategories": [{
+            "name": "Airspaces",
+            "layers": [
+                "airspace-at",
+                "airspace-it",
+
+            ]
+        },
         // {
-        //     "name": "Available layers",
-        //     "layers": ["paths"
-        //     // , "paths", "countries"
-        //     ]
-        // },
+        // 	"name": "Actual Event Post Data",
+        // 	"layers" : [
+        // 		"events_bushfire", "events_drought", "events_earthquake", "events_flood", "events_general", "events_severeThunderstorm", "events_severeWeather",
+        // 		"events_tornado", "events_tropicalCyclone"
+        // 	]
+        // }
     ],
+    "layers": [
+        //        radiosonde.mah.priv.at/static/airspace# austria_at.geojson
+        // Historic layers
+
+        {
+            "id": "airspace-at",
+            "name": "AT Airspace",
+            "type": "geoJSON",
+            "url": "https://radiosonde.mah.priv.at/static/airspace/austria_at.geojson"
+        },
+        {
+            "id": "airspace-it",
+            "name": "IT Airspace",
+            "type": "geoJSON",
+            "url": "https://radiosonde.mah.priv.at/static/airspace/italy_it.geojson"
+        },
+
+    ],
+    // "TOC": {
+    //     //https://leafletjs.com/reference-1.0.2.html#control-layers-option
+    //     "collapsed": true,
+    //     "uncategorisedLabel": "Layers",
+    //     "position": "topright",
+    //     "toggleAll": true
+    // },
     "projections": [{
         4269: '+proj=longlat +ellps=GRS80 +datum=NAD83 +no_defs '
     }],
