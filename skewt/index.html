@@ -1,0 +1,56 @@
+<!DOCTYPE HTML>
+
+<html>
+
+<head>
+  <title>Untitled</title>
+  <link rel="stylesheet" href="skewt.css">
+  <style>
+        #wrapper{
+            height:400px;
+            width:400px;
+            border:1px solid black;
+        }
+  </style>
+
+</head>
+
+<body>
+    <div id="wrapper" ></div>
+    <div>press "q" or "w"  to increase or decrease the gradient</div>
+</body>
+
+<script src="https://d3js.org/d3.v5.min.js"></script>
+<script src="data.js"></script>
+<script src="math.js"></script>
+<script src="atmosphere.js"></script>
+<script src="skewt.js"></script>
+
+
+<script type="module">
+
+
+//import data from "./data.js";  //test data
+
+//import SkewT from "./skewt.js";
+
+let gradient=55;
+
+let st=new SkewT("#wrapper");
+
+function newST(gradient){
+    st.clear();
+    st.clearBg();
+    st.drawBackground(gradient);
+    st.plot(data);
+}
+newST(gradient);
+
+document.onkeypress=k=>{
+    if (k.key=="q") { gradient += 5; newST(gradient)}
+    else if (k.key=="w") { gradient -= 5; newST(gradient)}
+}
+
+
+</script>
+</html>
