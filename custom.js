@@ -115,22 +115,32 @@ function loadAscent(url, ascent, completion) {
     );
 }
 
-function plotStation(feature) {
-    $('#sidebarTitle').html(feature.properties.name);
 
-    console.log("plotStation feature=", feature);
-    var latest = feature.properties.ascents[0];
-    if (!latest.hasOwnProperty('data')) {
-        var p = datapath + latest.path;
-        loadAscent(p, latest, plotSkewT);
+function timeString(unxiTimestamp) {
+    var ts = new Date(unxiTimestamp * 1000);
+    return ts.toUTCString()
+}
+
+function plotStation(feature, index) {
+
+    var ascent = feature.properties.ascents[index];
+    var syntime = ascent.syn_timestamp;
+    var text = feature.properties.name;
+    $('#sidebarTitle').html(text);
+
+    $('#sidebarBottom').html(timeString(syntime));
+
+    if (!ascent.hasOwnProperty('data')) {
+        var p = datapath + ascent.path;
+        loadAscent(p, ascent, plotSkewT);
     }
     else {
-        plotSkewT(latest.data);
+        plotSkewT(ascent.data);
     }
 }
 
 function clicked(l) {
-    plotStation(l.target.feature);
+    plotStation(l.target.feature, 0);
 }
 
 function findBUFR(value, index, array) {
@@ -248,7 +258,7 @@ function gotSummary(data) {
             });
         }
         else {
-            plotStation(f);
+            plotStation(f, 0);
         }
     }
 }
