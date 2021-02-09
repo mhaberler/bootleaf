@@ -208,7 +208,7 @@ var SkewT = function(div) {
     }
 
     var makeBarbTemplates = function(){
-        var speeds = d3.range(5,105,5);
+        var speeds = d3.range(5,205,5);
         var barbdef = container.append('defs')
         speeds.forEach(function(d) {
             var thisbarb = barbdef.append('g').attr('id', 'barb'+d);
@@ -316,7 +316,7 @@ var SkewT = function(div) {
         }
 
         //barbs stuff
-        var stepH = 1000;
+        var stepH = 500;
         var lastH=-500;
         var barbs = skewtline.filter(function(d) {
             if (d.hght > lastH) {
