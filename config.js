@@ -145,13 +145,17 @@ var config = {
             "id": "airspace-at",
             "name": "AT Airspace",
             "type": "geoJSON",
-            "url": "https://radiosonde.mah.priv.at/static/airspace/austria_at.geojson"
+            "url": "https://radiosonde.mah.priv.at/static/airspace/austria_at.geojson",
+            "opacity": 0.1,
+            "visible": false,
         },
         {
             "id": "airspace-it",
             "name": "IT Airspace",
             "type": "geoJSON",
-            "url": "https://radiosonde.mah.priv.at/static/airspace/italy_it.geojson"
+            "url": "https://radiosonde.mah.priv.at/static/airspace/italy_it.geojson",
+            "opacity": 0.1,
+            "visible": false,
         },
 
     ],
@@ -174,33 +178,4 @@ var config = {
         "fillColor": '#E31A1C',
         "stroke": true
     },
-    "layers": [
-        // {
-        // "id": "paths",
-        // "name": "Paths",
-        // "type": "geoJSON",
-        // "cluster": true,
-        // "showCoverageOnHover": false,
-        // "minZoom": 12,
-        // "url": "./data/theatres.geojson",
-        // "icon": {
-        //     "iconUrl": "./img/theater.png",
-        //     "iconSize": [24,28]
-        // },
-        // "style": {
-        // "stroke": true,
-        // "fillColor": "#00FFFF",
-        // "fillOpacity": 0.5,
-        // "radius": 10,
-        // "weight": 0.5,
-        // "opacity": 1,
-        // "color": '#727272',
-        // },
-        //   "visible": false,
-        //   // "label": {
-        //   // 	"name": "NAME",
-        //   // 	"minZoom": 14
-        //   // }
-        // }
-    ]
 }
