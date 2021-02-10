@@ -309,6 +309,8 @@ function loadMap(){
 
       } else if (layerType === "tileLayer") {
         layer = L.tileLayer(layerConfig.url, layerConfig);
+      } else if (layerType === "nextzenMvtLayer") {
+        layer = L.vectorGrid.protobuf(layerConfig.url, layerConfig);
       } else if (layerType === "geoJSON") {
 
         $.ajax({
