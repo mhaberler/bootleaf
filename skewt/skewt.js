@@ -322,8 +322,8 @@ var SkewT = function(div) {
             if (d.hght > lastH) {
                 var result =  (d.hght > lastH && d.wdir >= 0 && d.wspd >= 0 && d.press >= topp);
                 lastH = lastH + stepH;
-                if (result)
-                    console.log( d.press, d.hght, lastH );
+                // if (result)
+                //     console.log( d.press, d.hght, lastH );
                 return result;
             }});
         var allbarbs = barbgroup.selectAll("barbs")
