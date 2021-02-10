@@ -157,6 +157,16 @@ var config = {
             "opacity": 0.1,
             "visible": false,
         },
+        {
+            "id": "eu-countries",
+            "name": "EU countries",
+            "type": "geoJSON",
+            "url": "https://radiosonde.mah.priv.at/static/eu-countries.geojson",
+            "opacity": 0.1,
+            "visible": false,
+        },
+
+
 
     ],
     // "TOC": {
