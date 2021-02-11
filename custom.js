@@ -1,5 +1,16 @@
 var datapath = 'https://radiosonde.mah.priv.at/data-dev/';
 var summary_url = datapath + 'summary.geojson';
+var isTouchDevice = _isTouchDevice();
+var summary = null;
+var markers = null;
+var saveMemory = isTouchDevice;
+var stations = {}; // features indexed by station_id
+var markerList = [];
+let zeroK = 273.15;
+let drawAscents = 1;
+var bookmarkLife = 2000;
+let maxHrs = 48;
+let agelimit = -24;
 
 var geojsonMarkerOptions = {
     radius: 10,
@@ -9,11 +20,9 @@ var geojsonMarkerOptions = {
     fillOpacity: 0.8
 };
 
-let maxHrs = 72;
-let startupAge = -24;
-
 var viridisStops = ['#440154', '#482777', '#3F4A8A', '#31678E', '#26838F', '#1F9D8A', '#6CCE5A', '#B6DE2B', '#FEE825'];
 var chroma_scale = chroma.scale(viridisStops);
+
 
 var path_colors = {
     "simulated": {
@@ -43,8 +52,6 @@ function round3(value) {
     return Math.round(value * 1000) / 1000
 }
 
-let zeroK = 273.15;
-
 function plotSkewT(geojson) {
     var data = [];
     var pscale = 1.;
@@ -54,15 +61,15 @@ function plotSkewT(geojson) {
     for (var i in geojson.features) {
         var p = geojson.features[i].properties;
         var press = p['pressure'];
-
         var sample = {
             "press": round3(press * pscale),
             "hght": round3(p['gpheight']),
             "temp": round3(p['temp'] - zeroK),
             "dwpt": round3(p['dewpoint'] - zeroK),
-
         };
-        if (!p.wind_u || !p.wind_u) {
+
+        if ((typeof p.wind_u  === "undefined") || (typeof p.wind_u === "undefined")) {
+        // if (!p.wind_u || !p.wind_u)
             data.push(sample);
             continue;
         }
@@ -73,8 +80,6 @@ function plotSkewT(geojson) {
     skewt.plot(data);
     $("#sidebar").show("slow");
 }
-
-let drawAscents = 1;
 
 function drawpath(feature) {
     var path_source = feature.properties.path_source;
@@ -186,15 +191,6 @@ function now() {
     return Math.floor(Date.now() / 1000);
 }
 
-
-var isTouchDevice = _isTouchDevice();
-
-var summary = null;
-var markers = null;
-var saveMemory = isTouchDevice;
-var stations = {}; // features indexed by station_id
-var markerList = [];
-
 function gotSummary(data) {
     console.log("gotSummary", data);
     summary = data;
@@ -236,7 +232,7 @@ function gotSummary(data) {
             return marker;
         }
     }); // .addTo(bootleaf.map);
-    updateMarkers(startupAge);
+    updateMarkers(agelimit);
 
     var station = getURLParameter("station");
     if (station) {
@@ -269,6 +265,7 @@ function addStations() {
 function beforeMapLoads() {
     console.log("Before map loads function");
 
+    agelimit = localStorage.getItem('agelimit');
     loadMap();
     addStations();
 }
@@ -286,9 +283,9 @@ function closeBookmark(e) {
     $(".leaflet-popup-close-button")[0].click();
 }
 
-var bookmarkLife = 2000;
 
-
+// not used right now
+// might come in use with track layers
 var pbfLayer;
 var clearHighlight = function() {
     if (highlight) {
@@ -300,7 +297,7 @@ var clearHighlight = function() {
 function afterMapLoads() {
 
     console.log("After map loads function");
-    // FIXME
+
     pbfLayer = bootleaf.layers[0];
     if (pbfLayer) {
         pbfLayer.on('click', function(e) { // The .on method attaches an event handler
@@ -334,7 +331,6 @@ function afterMapLoads() {
     createAgeSlider(markers);
 }
 
-
 function updateMarkers(agelimit) {
     markerList.forEach(function(marker, index) {
         var ts = marker.feature.properties.ascents[0].syn_timestamp;
@@ -345,6 +341,7 @@ function updateMarkers(agelimit) {
             bootleaf.map.addLayer(marker);
         }
     });
+    localStorage.setItem('agelimit', agelimit);
 }
 
 function createAgeSlider(markers) {
@@ -368,7 +365,7 @@ function createAgeSlider(markers) {
             var bs = jQuery(input).bootstrapSlider({
                 min: -maxHrs,
                 max: 0,
-                value: startupAge,
+                value: agelimit,
                 tooltip_position: 'top',
                 tooltip: 'always',
                 formatter: function(value) {
@@ -383,5 +380,4 @@ function createAgeSlider(markers) {
         }
     });
     bootleaf.map.addControl(new SequenceControl());
-
 };
