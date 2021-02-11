@@ -9,8 +9,9 @@ var markerList = [];
 let zeroK = 273.15;
 let drawAscents = 1;
 var bookmarkLife = 2000;
-let maxHrs = 48;
-let agelimit = -24;
+var maxHrs = 48;
+var agelimit;
+var agelimitDefault = -24;
 
 var geojsonMarkerOptions = {
     radius: 10,
@@ -266,6 +267,11 @@ function beforeMapLoads() {
     console.log("Before map loads function");
 
     agelimit = localStorage.getItem('agelimit');
+
+    if(!agelimit) {
+        agelimit = agelimitDefault;
+        localStorage.setItem('agelimit', agelimit);
+    } 
     loadMap();
     addStations();
 }
@@ -364,7 +370,7 @@ function createAgeSlider(markers) {
 
             var bs = jQuery(input).bootstrapSlider({
                 min: -maxHrs,
-                max: 0,
+                max: 3,
                 value: agelimit,
                 tooltip_position: 'top',
                 tooltip: 'always',
