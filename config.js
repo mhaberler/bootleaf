@@ -335,6 +335,8 @@ var config = {
             "url": "https://radiosonde.mah.priv.at/static/airspace/austria_at.geojson",
             "opacity": 0.1,
             "visible": false,
+            // "legendClass": "tropical_cyclone",
+
         },
         {
             "id": "airspace-it",
@@ -352,22 +354,27 @@ var config = {
             "opacity": 0.1,
             "visible": false,
         },
-        {
-            "id": "nextzen",
-            "name": "nextzen Demo",
-            "type": "nextzenMvtLayer",
-            "url": "https://tile.nextzen.org/tilezen/vector/v1/512/all/{z}/{x}/{y}.mvt?api_key={apikey}",
-            // "opacity": 0.1,
-            "apikey": 'gCZXZglvRQa6sB2z7JzL1w',
-            //mah radiosonde apikey: 'aPvDbkMQRAehOzfpj2Ql3A',
-            "rendererFactory": L.canvas.tile,
-            "attribution": '<a href="https://nextzen.com/">&copy; NextZen</a>, <a href="http://www.openstreetmap.org/copyright">&copy; OpenStreetMap</a> contributors',
-            vectorTileLayerStyles: vectorTileStyling,
-            //apikey: 'gCZXZglvRQa6sB2z7JzL1w',
-            //apikey: 'aPvDbkMQRAehOzfpj2Ql3A',
-
-            "visible": false,
-        },
+        // {
+        //     "id": "nextzen",
+        //     "name": "nextzen Demo",
+        //     "type": "nextzenMvtLayer",
+        //     "url": "https://tile.nextzen.org/tilezen/vector/v1/512/all/{z}/{x}/{y}.mvt?api_key={apikey}",
+        //     // "opacity": 0.1,
+        //     "apikey": 'gCZXZglvRQa6sB2z7JzL1w',
+        //     //mah radiosonde apikey: 'aPvDbkMQRAehOzfpj2Ql3A',
+        //     "rendererFactory": L.canvas.tile,
+        //     "attribution": '<a href="https://nextzen.com/">&copy; NextZen</a>, <a href="http://www.openstreetmap.org/copyright">&copy; OpenStreetMap</a> contributors',
+        //     vectorTileLayerStyles: vectorTileStyling,
+        //     //apikey: 'gCZXZglvRQa6sB2z7JzL1w',
+        //     //apikey: 'aPvDbkMQRAehOzfpj2Ql3A',
+        //
+        //     "interactive": true,	// Make sure that this VectorGrid fires mouse/pointer events
+		// 	"getFeatureId": function(f) {
+		// 		return f.properties.id;
+		// 	},
+        //
+        //     "visible": false,
+        // },
 
 
 

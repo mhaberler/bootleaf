@@ -1,5 +1,3 @@
-
-
 var datapath = 'https://radiosonde.mah.priv.at/data-dev/';
 var summary_url = datapath + 'summary.geojson';
 
@@ -12,10 +10,10 @@ var geojsonMarkerOptions = {
 };
 
 let maxHrs = 72;
-let marker_chroma = {
-    "BUFR": chroma.scale(['yellow', '008ae5']),
-    "netCDF": chroma.scale(['yellow', 'red', 'black'])
-};
+let startupAge = -24;
+
+var viridisStops = ['#440154', '#482777', '#3F4A8A', '#31678E', '#26838F', '#1F9D8A', '#6CCE5A', '#B6DE2B', '#FEE825'];
+var chroma_scale = chroma.scale(viridisStops);
 
 var path_colors = {
     "simulated": {
@@ -56,16 +54,21 @@ function plotSkewT(geojson) {
     for (var i in geojson.features) {
         var p = geojson.features[i].properties;
         var press = p['pressure'];
-        if (!p.wind_u || !p.wind_u)
-            continue;
-        data.push({
+
+        var sample = {
             "press": round3(press * pscale),
             "hght": round3(p['gpheight']),
             "temp": round3(p['temp'] - zeroK),
             "dwpt": round3(p['dewpoint'] - zeroK),
-            "wdir": round3(uv2dir(p['wind_u'], p['wind_v'])),
-            "wspd": round3(uv2speed(p['wind_u'], p['wind_v']))
-        });
+
+        };
+        if (!p.wind_u || !p.wind_u) {
+            data.push(sample);
+            continue;
+        }
+        sample["wdir"] = round3(uv2dir(p['wind_u'], p['wind_v']));
+        sample["wspd"] = round3(uv2speed(p['wind_u'], p['wind_v']));
+        data.push(sample);
     }
     skewt.plot(data);
     $("#sidebar").show("slow");
@@ -103,7 +106,6 @@ function mouseover(l) {
 
 var skewt = new SkewT('#sidebarContents');
 
-
 function loadAscent(url, ascent, completion) {
     $.getJSON(url,
         (function(a) {
@@ -116,7 +118,6 @@ function loadAscent(url, ascent, completion) {
     );
 }
 
-
 // toJSON: 2021-02-09T15:54:08.639Z
 function timeString(unxiTimestamp) {
     var ts = new Date(unxiTimestamp * 1000).toJSON();
@@ -126,7 +127,6 @@ function timeString(unxiTimestamp) {
 function plotStation(feature, index) {
 
     var ascent = feature.properties.ascents[index];
-    var syntime = ascent.syn_timestamp;
     var text = feature.properties.name;
     $('#sidebarTitle').html(text);
 
@@ -143,6 +143,7 @@ function plotStation(feature, index) {
     a.href = "https://radiosonde.mah.priv.at/dev/?station=" + ascent.station_id;
     $('#sidebarSubTitle').html(a);
 
+    var syntime = ascent.syn_timestamp;
     $('#box1').html(timeString(syntime));
     //    $('#box2').html("id: " + ascent.station_id);
     if (ascent.source === "BUFR") {
@@ -181,12 +182,18 @@ function _isTouchDevice() {
         (navigator.msMaxTouchPoints > 0));
 }
 
+function now() {
+    return Math.floor(Date.now() / 1000);
+}
+
+
 var isTouchDevice = _isTouchDevice();
 
 var summary = null;
 var markers = null;
 var saveMemory = isTouchDevice;
 var stations = {}; // features indexed by station_id
+var markerList = [];
 
 function gotSummary(data) {
     console.log("gotSummary", data);
@@ -204,57 +211,33 @@ function gotSummary(data) {
             return true;
         },
         pointToLayer: function(feature, latlng) {
-            let now = Math.floor(Date.now() / 1000);
-            let ascents = feature.properties.ascents;
+            let ascent = feature.properties.ascents[0];
+            var ts = ascent.syn_timestamp;
 
-            // prefer BUFR over netCDF
-            // ascents are sorted descending by syn_timestamp
-            // both netCDF either/or BUFR-derived ascents with same syn_timestamp
-            // may be present.
-            // BUFR-derived ascents are better quality data so prefer them.
-            // we keep the netCDF-derived ascents of same timestamp around
-            // to check how good the trajectory simulation is
-            var newest_bufr = ascents.find(findBUFR);
-            var newest_netcdf = ascents.find(findnetCDF);
-            if (!newest_bufr && !newest_netcdf)
-                return;
-
-            var a;
-            if (newest_bufr && newest_netcdf &&
-                (newest_bufr.syn_timestamp) ==
-                (newest_netcdf.syn_timestamp)) {
-                a = [newest_bufr, newest_netcdf];
-            }
-            else {
-                if (newest_bufr)
-                    a = [newest_bufr];
-                else
-                    a = [newest_netcdf];
-            }
-            var primary = a[0];
-            var ts = primary.syn_timestamp;
-
-            var age_hrs = (now - ts) / 3600;
+            var age_hrs = (now() - ts) / 3600;
             var age_index = Math.round(Math.min(age_hrs, maxHrs - 1));
             age_index = Math.max(age_index, 0);
             var rounded_age = Math.round(age_hrs * 10) / 10;
-            geojsonMarkerOptions.fillColor = marker_chroma[primary.source](age_index / maxHrs);
-            var marker = L.circleMarker(latlng, geojsonMarkerOptions);
 
+            geojsonMarkerOptions.fillColor = chroma_scale(1 - age_index / maxHrs);
+            var marker = L.circleMarker(latlng, geojsonMarkerOptions);
+            markerList.push(marker);
             var content = "<b>" + feature.properties.name + "</b>" + "<br>  " + rounded_age + " hours old";
             if (isTouchDevice) {
                 marker.on('click', clicked);
             }
             else {
                 marker.bindTooltip(content, {
-                        className: primary.source + 'CSSClass'
+                        className: ascent.source + 'CSSClass'
                     }).openTooltip()
                     .on('click', clicked);
                 //                        .on('mouseover', mouseover);
             }
             return marker;
         }
-    }).addTo(bootleaf.map);
+    }); // .addTo(bootleaf.map);
+    updateMarkers(startupAge);
+
     var station = getURLParameter("station");
     if (station) {
         f = stations[station];
@@ -281,14 +264,11 @@ function addStations() {
         .fail(function(jqXHR, textStatus, err) {
             failedSummary(jqXHR, textStatus, err);
         });
-
 }
 
 function beforeMapLoads() {
     console.log("Before map loads function");
 
-
-    // Continue to load the map
     loadMap();
     addStations();
 }
@@ -308,13 +288,100 @@ function closeBookmark(e) {
 
 var bookmarkLife = 2000;
 
-function afterMapLoads() {
-    // This function is run after the map has loaded. It gives access to bootleaf.map, bootleaf.TOCcontrol, etc
 
+var pbfLayer;
+var clearHighlight = function() {
+    if (highlight) {
+        pbfLayer.resetFeatureStyle(highlight);
+    }
+    highlight = null;
+};
+
+function afterMapLoads() {
 
     console.log("After map loads function");
+    // FIXME
+    pbfLayer = bootleaf.layers[0];
+    if (pbfLayer) {
+        pbfLayer.on('click', function(e) { // The .on method attaches an event handler
+                L.popup()
+                    .setContent(e.layer.properties.name || e.layer.properties.type ||
+                        e.layer.properties.kind)
+                    // 					.setContent(JSON.stringify(e.layer))
+                    .setLatLng(e.latlng)
+                    .openOn(bootleaf.map)
+                    .on('remove', clearHighlight);
 
+                highlight = e.layer.properties.id;
+                if (highlight) {
+                    pbfLayer.setFeatureStyle(highlight, {
+                        weight: 2,
+                        color: 'red',
+                        opacity: 1,
+                        fillColor: 'red',
+                        fill: true,
+                        radius: 6,
+                        fillOpacity: 1
+                    });
+                    L.DomEvent.stop(e);
+                }
+            })
+            .addTo(bootleaf.map);
+    }
     bootleaf.map.on('bookmark:show', function(e) {
         fadeoutManager(closeBookmark, bookmarkLife, e);
     });
+    createAgeSlider(markers);
 }
+
+
+function updateMarkers(agelimit) {
+    markerList.forEach(function(marker, index) {
+        var ts = marker.feature.properties.ascents[0].syn_timestamp;
+        var age_hrs = (now() - ts) / 3600;
+        if (age_hrs > -agelimit) {
+            bootleaf.map.removeLayer(marker);
+        } else {
+            bootleaf.map.addLayer(marker);
+        }
+    });
+}
+
+function createAgeSlider(markers) {
+
+    var SequenceControl = L.Control.extend({
+        options: {
+            position: 'bottomleft'
+        },
+        onAdd: function() {
+            // create the control container div with a particular class name
+            var container = L.DomUtil.create('div', 'mahinfo mahlegend');
+
+            // Use a child input.
+            var input = L.DomUtil.create('input');
+            input.type = "text";
+            input.id = "cutoff";
+
+            // Insert the input as child of container.
+            container.appendChild(input);
+
+            var bs = jQuery(input).bootstrapSlider({
+                min: -maxHrs,
+                max: 0,
+                value: startupAge,
+                tooltip_position: 'top',
+                tooltip: 'always',
+                formatter: function(value) {
+                    return 'newer than: ' + -value + ' hours';
+                }
+            }).on('change', function() {
+                updateMarkers( parseFloat($(this).val()));
+            });
+            L.DomEvent.disableClickPropagation(container);
+
+            return container;
+        }
+    });
+    bootleaf.map.addControl(new SequenceControl());
+
+};
