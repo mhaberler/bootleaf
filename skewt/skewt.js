@@ -14,11 +14,12 @@ var SkewT = function(div) {
     //properties used in calculations
     var wrapper = d3.select(div);
     var width = parseInt(wrapper.style('width'), 10);
-    var height = width; //tofix
+    var height = width + 20; //tofix
     var margin = {top: 10, right: 30, bottom: 10, left: 20}; //container margins
     var deg2rad = (Math.PI/180);
-    var gradient;
-    var tan = Math.tan((gradient || 55) *deg2rad);
+    var gradient = 55;
+    var steph = 1000;
+    var tan;
     var basep = 1000;
     var topp = 100;
     var steph = 1000;
@@ -37,6 +38,8 @@ var SkewT = function(div) {
 
     //containers
     var svg = wrapper.append("svg").attr("id", "svg");	 //main svg
+    var controls = wrapper.append("div").attr("class","controls");
+    var rangeContainer = wrapper.append("div").attr("class","range-container");
     var container = svg.append("g").attr("id", "container"); //container
     var skewtbg = container.append("g").attr("id", "skewtbg").attr("class", "skewtbg");//background
     var skewtgroup = container.append("g").attr("class", "skewt"); // put skewt lines in this group
@@ -48,6 +51,7 @@ var SkewT = function(div) {
         height = width; //to fix
         w = width - margin.left - margin.right;
         h = width - margin.top - margin.bottom;
+        tan = Math.tan((gradient || 55) *deg2rad);
         x = d3.scaleLinear().range([0, w]).domain([-45,50]);
         y = d3.scaleLog().range([0, h]).domain([topp, basep]);
         xAxis = d3.axisBottom(x).tickSize(0,0).ticks(10);//.orient("bottom");
@@ -82,11 +86,10 @@ var SkewT = function(div) {
         plot(data);
     }
 
-    var drawBackground = function(g) {
 
-        console.log(g)
-        gradient=g;
-        tan = Math.tan((gradient || 55) *deg2rad);
+    let lines={};
+
+    var drawBackground = function() {
 
         // Add clipping path
         skewtbg.append("clipPath")
@@ -99,10 +102,10 @@ var SkewT = function(div) {
 
 
         // Skewed temperature lines
-        skewtbg.selectAll("templine")
+        lines.temp = skewtbg.selectAll("templine")
         .data(d3.range(-100,45,10))
         .enter().append("line")
-        .attr("x1", d => x(d)-0.5 + (y(basep)-y(100))/tan)
+        .attr("x1", d => x(d)-0.5 + (y(basep)-y(topp))/tan)
         .attr("x2", d => x(d)-0.5)
         .attr("y1", 0)
         .attr("y2", h)
@@ -112,14 +115,14 @@ var SkewT = function(div) {
 
 
         // Logarithmic pressure lines
-        skewtbg.selectAll("pressureline")
+        lines.pressure = skewtbg.selectAll("pressureline")
         .data(plines)
         .enter().append("line")
         .attr("x1", 0)
         .attr("x2", w)
         .attr("y1", y )
         .attr("y2", y)
-        .attr("class", "gridline");
+        .attr("class", "pressure");
 
 
         // create array to plot dry adiabats
@@ -145,7 +148,7 @@ var SkewT = function(div) {
 
 
         // Draw dry adiabats
-        skewtbg.selectAll("dryadiabatline")
+        lines.dryadiabat = skewtbg.selectAll("dryadiabatline")
         .data(all)
         .enter().append("path")
         .attr("class", "dryadiabat")
@@ -164,7 +167,7 @@ var SkewT = function(div) {
 
 
         // Draw moist adiabats
-        skewtbg.selectAll("moistadiabatline")
+        lines.moistadiabat = skewtbg.selectAll("moistadiabatline")
         .data(all)
         .enter().append("path")
         .attr("class", "moistadiabat")
@@ -186,7 +189,7 @@ var SkewT = function(div) {
 
 
         // Draw isohumes
-        skewtbg.selectAll("isohume")
+        lines.isohume = skewtbg.selectAll("isohumeline")
         .data(all)
         .enter().append("path")
         .attr("class", "isohume")
@@ -301,7 +304,8 @@ var SkewT = function(div) {
         skewtlines.push(skewtline);
 
         var templine = d3.line().curve(d3.curveLinear).x(function(d,i) { return x(d.temp) + (y(basep)-y(d.press))/tan; }).y(function(d,i) { return y(d.press); });
-        var tempLines = skewtgroup.selectAll("templines")
+        tempLines = skewtgroup
+            .selectAll("templines")
             .data(skewtlines).enter().append("path")
             .attr("class", function(d,i) { return (i<10) ? "temp skline" : "temp mean" })
             .attr("clip-path", "url(#clipper)")
@@ -310,7 +314,8 @@ var SkewT = function(div) {
         if (data[0].dwpt){
 
             var tempdewline = d3.line().curve(d3.curveLinear).x(function(d,i) { return x(d.dwpt) + (y(basep)-y(d.press))/tan; }).y(function(d,i) { return y(d.press); });
-            var tempDewlines = skewtgroup.selectAll("tempdewlines")
+            var tempDewlines = skewtgroup
+                .selectAll("tempdewlines")
                 .data(skewtlines).enter().append("path")
                 .attr("class", function(d,i) { return (i<10) ? "dwpt skline" : "dwpt mean" })
                 .attr("clip-path", "url(#clipper)")
@@ -321,7 +326,7 @@ var SkewT = function(div) {
 
         //barbs stuff
         var lastH=-500;
-        var barbs = skewtline.filter(function(d) {  if (d.hght>lastH+1500) lastH=d.hght; return (d.hght==lastH && d.wdir >= 0 && d.wspd >= 0 && d.press >= topp); });
+        var barbs = skewtline.filter(function(d) {  if (d.hght>lastH+steph) lastH=d.hght; return (d.hght==lastH && d.wdir >= 0 && d.wspd >= 0 && d.press >= topp); });
         var allbarbs = barbgroup.selectAll("barbs")
             .data(barbs).enter().append("use")
             .attr("xlink:href", function (d) { return "#barb"+Math.round(convert(d.wspd, "kt")/5)*5; }) // 0,5,10,15,... always in kt
@@ -330,6 +335,46 @@ var SkewT = function(div) {
         //mouse over
         drawToolTips(skewtlines[0]);
     }
+
+    //controls
+    let buttons = [{name:"Dry Adiabat"},{name:"Moist Adiabat"},{name:"Isohume"},{name:"Temp"},{name:"Pressure"}];
+    buttons.forEach(b=>{
+        b.hi=false;
+        b.el=controls.append("div").attr("class","buttons").text(b.name).on("click", ()=>{
+            b.hi=!b.hi;
+            b.el.node().classList[b.hi?"add":"remove"]("clicked");
+            let line=b.name.replace(" ","").toLowerCase();
+            lines[line]._groups[0].forEach(p=>p.classList[b.hi?"add":"remove"]("highlight-line"));
+        })
+    })
+
+    let ranges= {gradient:{min:5, max:90, step:5,  value:gradient},topp:{ val:100, min:100, max:900, step: 50, value:100}};
+    for (let p in ranges){
+        let r=ranges[p];
+        r.valueDiv = rangeContainer.append("div").attr("class","skewt-range-val").text(p=="gradient"?"Gradient:":p=="topp"?"Top P:":"");
+        r.valueDiv = rangeContainer.append("div").attr("class","skewt-range-val").text(r.value);
+        r.input = rangeContainer.append("input").attr("type","range").attr("min",r.min).attr("max",r.max).attr("step",r.step).attr("value",r.value).attr("class","skewt-ranges")
+        .on("input",(a,b,c)=>{
+            r.value=+c[0].value;
+            r.valueDiv.text(r.value);
+            console.log(r.name, r.value);
+            if(p=="gradient") gradient = r.value;
+            if(p=="topp"){
+                let pph=y(basep)-y(topp);
+                topp= r.value;
+                let ph=y(basep)-y(topp);
+                console.log(pph,ph);
+                ranges.gradient.input.node().value = ranges.gradient.value = gradient = Math.atan(Math.tan(gradient*deg2rad) * pph/ph)/deg2rad;
+                ranges.gradient.valueDiv.text(Math.round(ranges.gradient.value));
+            }
+            //setVariables();
+            resize();
+        })
+        rangeContainer.append("div").attr("class","flex-break");
+    }
+
+
+
 
     var clear = function(s){
         skewtgroup.selectAll("path").remove(); //clear previous paths from skew
@@ -350,8 +395,8 @@ var SkewT = function(div) {
 
     var setParams = function(p){
         ({ topp=topp, basep=basep, steph=steph, gradient=gradient} = p);
-
     }
+
 
 
 

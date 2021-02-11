@@ -1,4 +1,24 @@
 
+    .controls{
+        box-sizing:border-box;
+        width:100%;
+        display:flex;
+    }
+    .controls .buttons{
+        flex-grow:1;
+        margin:3px;
+        padding:3px;
+        border-radius:10px;
+        text-align:center;
+        font:10px Arial;
+        cursor:pointer;
+        background-color:rgba(200,200,200,1);
+    }
+    .controls .buttons.clicked{
+        background-color:rgba(150,150,150,1);
+        color:white;
+    }
+
     .axis path,
     .axis line {
       fill: none;
@@ -27,11 +47,16 @@
     .skline   { stroke-width: 1.8px; opacity: 0.8;}
     .mean     { stroke-width: 2.5px; }
 
-    .gridline, .tempzero, .dryadiabat, .templine,  .moistadiabat,  .isohume  {
+    .gridline, .tempzero, .dryadiabat, .templine,  .moistadiabat,  .isohume,  .pressure  {
        stroke-width: 0.5px;
        stroke-opacity:0.3;
        fill: none;
     }
+    .highlight-line{
+        stroke-opacity:1;
+        stroke-width:1px;
+    }
+
     .tempzero { stroke: #aaa; stroke-width: 1.25px; }
 
     .dryadiabat{
@@ -39,6 +64,9 @@
     }
     .templine{
         stroke: red;
+    }
+    .pressure{
+        stroke: rgba(120,120,120);
     }
     .moistadiabat{
         stroke: green;
@@ -61,4 +89,21 @@
     .focus.dwpc circle { fill: green; stroke: none; }
     .focus text { font-size: 12px; }
 
+    .range-container{
+        display:flex;
+        flex-wrap:wrap;
+        margin-top:10px;
+    }
 
+    .skewt-ranges{
+        width:60%;
+    }
+
+    .skewt-range-val{
+        font:10px Arial;
+        width:15%;
+    }
+
+    .flex-break{
+        flex-basis:100%;
+    }

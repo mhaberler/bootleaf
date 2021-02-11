@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="skewt.css">
   <style>
         #wrapper{
-            height:400px;
+            box-sizing:border-box;
             width:400px;
             border:1px solid black;
         }
@@ -46,10 +46,22 @@ function newST(gradient){
 }
 newST(gradient);
 
+let p={topp,basep,steph,gradient};
+
 document.onkeypress=k=>{
-    if (k.key=="q") { gradient += 5; newST(gradient)}
-    else if (k.key=="w") { gradient -= 5; newST(gradient)}
+    if (k.key=="1") { gradient += 5; newST(gradient)}
+    else if (k.key=="2") { gradient -= 5; newST(gradient)}
+    else if (k.key=="3") { gradient -= 5; newST(gradient)}
+    else if (k.key=="4") { gradient -= 5; newST(gradient)}
+    else if (k.key=="5") { gradient -= 5; newST(gradient)}
+    else if (k.key=="6") { gradient -= 5; newST(gradient)}
+    else if (k.key=="7") { gradient -= 5; newST(gradient)}
+    else if (k.key=="8") { gradient -= 5; newST(gradient)}
+
+
+
 }
+
 
 
 </script>
