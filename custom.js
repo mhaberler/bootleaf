@@ -271,7 +271,7 @@ function beforeMapLoads() {
     if(!agelimit) {
         agelimit = agelimitDefault;
         localStorage.setItem('agelimit', agelimit);
-    } 
+    }
     loadMap();
     addStations();
 }
@@ -370,7 +370,7 @@ function createAgeSlider(markers) {
 
             var bs = jQuery(input).bootstrapSlider({
                 min: -maxHrs,
-                max: 3,
+                max: -3,
                 value: agelimit,
                 tooltip_position: 'top',
                 tooltip: 'always',
