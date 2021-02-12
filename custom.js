@@ -19,7 +19,7 @@ var geojsonMarkerOptions = {
     weight: 1,
     opacity: 1,
     fillOpacity: 0.8,
-    className: "context-menu-one"
+    className: "context-menu-marker"
 };
 
 var viridisStops = ['#440154', '#482777', '#3F4A8A', '#31678E', '#26838F', '#1F9D8A', '#6CCE5A', '#B6DE2B', '#FEE825'];
@@ -337,54 +337,7 @@ function afterMapLoads() {
     });
     createAgeSlider(markers);
 
-
-    $(function() {
-        $.contextMenu({
-            selector: '.context-menu-one',
-            callback: function(key, options) {
-                var m = "clicked: " + key;
-                window.console && console.log(m) || alert(m);
-            },
-            items: {
-                "edit": {
-                    name: "Edit",
-                    icon: "edit"
-                },
-                "cut": {
-                    name: "Cut",
-                    icon: "cut"
-                },
-                copy: {
-                    name: "Copy",
-                    icon: "copy"
-                },
-                "paste": {
-                    name: "Paste",
-                    icon: "paste"
-                },
-                "delete": {
-                    name: "Delete",
-                    icon: "delete"
-                },
-                "sep1": "---------",
-                "quit": {
-                    name: "Quit",
-                    icon: function() {
-                        return 'context-menu-icon context-menu-icon-quit';
-                    }
-                }
-            }
-        });
-
-        $('.context-menu-one').on('click', function(e) {
-            console.log('clicked', this);
-        })
-    });
-
-    // //Right click on the map activated
-    // bootleaf.map.on('contextmenu', function(e) {
-    //     ctxmenu(e); // alert(e.latlng);
-    // });
+    createContextMenus();
 
 }
 
@@ -439,3 +392,98 @@ function createAgeSlider(markers) {
     });
     bootleaf.map.addControl(new SequenceControl());
 };
+
+function createContextMenus() {
+
+    $(function() {
+        $.contextMenu({
+            selector: '.context-menu-marker',
+            callback: function(key, options) {
+                var m = "XX marker clicked: " + key;
+                console.log(m);
+            },
+            items: {
+                "history": {
+                    name: "History",
+                    icon: "edit"
+                },
+                "details": {
+                    name: "Details",
+                    icon: "cut"
+                },
+                // copy: {
+                //     name: "Copy",
+                //     icon: "copy"
+                // },
+                // "paste": {
+                //     name: "Paste",
+                //     icon: "paste"
+                // },
+                // "delete": {
+                //     name: "Delete",
+                //     icon: "delete"
+                // },
+                // "sep1": "---------",
+                "quit": {
+                    name: "Quit",
+                    icon: function() {
+                        return 'context-menu-icon context-menu-icon-quit';
+                    }
+                }
+            }
+        });
+
+        // $('.context-menu-marker').on('click', function(e) {
+        //     console.log('YY marker clicked', this);
+        // })
+    });
+
+    $(function() {
+        $.contextMenu({
+            selector: '.leaflet-container .context-menu-map', // '.context-menu-map',
+            callback: function(key, options) {
+                var m = "XX map clicked: " + key;
+                console.log(m)
+            },
+            items: {
+                "edit": {
+                    name: "Map Edit",
+                    icon: "edit"
+                },
+                "cut": {
+                    name: "Cut",
+                    icon: "cut"
+                },
+                copy: {
+                    name: "Copy",
+                    icon: "copy"
+                },
+                "paste": {
+                    name: "Paste",
+                    icon: "paste"
+                },
+                "delete": {
+                    name: "Delete",
+                    icon: "delete"
+                },
+                "sep1": "---------",
+                "quit": {
+                    name: "Quit",
+                    icon: function() {
+                        return 'context-menu-icon context-menu-icon-quit';
+                    }
+                }
+            }
+        });
+
+        // $('.context-menu-map').on('click', function(e) {
+        $('.leaflet-container').on('click', function(e) {
+            console.log('YY map clicked', this);
+        });
+    });
+
+    // //Right click on the map activated
+    // bootleaf.map.on('contextmenu', function(e) {
+    //     ctxmenu(e); // alert(e.latlng);
+    // });
+}
