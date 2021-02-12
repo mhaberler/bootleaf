@@ -18,7 +18,8 @@ var geojsonMarkerOptions = {
     color: "#000",
     weight: 1,
     opacity: 1,
-    fillOpacity: 0.8
+    fillOpacity: 0.8,
+    className: "context-menu-one"
 };
 
 var viridisStops = ['#440154', '#482777', '#3F4A8A', '#31678E', '#26838F', '#1F9D8A', '#6CCE5A', '#B6DE2B', '#FEE825'];
@@ -69,8 +70,8 @@ function plotSkewT(geojson) {
             "dwpt": round3(p['dewpoint'] - zeroK),
         };
 
-        if ((typeof p.wind_u  === "undefined") || (typeof p.wind_u === "undefined")) {
-        // if (!p.wind_u || !p.wind_u)
+        if ((typeof p.wind_u === "undefined") || (typeof p.wind_u === "undefined")) {
+            // if (!p.wind_u || !p.wind_u)
             data.push(sample);
             continue;
         }
@@ -193,7 +194,7 @@ function now() {
 }
 
 function gotSummary(data) {
-    console.log("gotSummary", data);
+    // console.log("gotSummary", data);
     summary = data;
     markers = L.geoJson(data, {
         filter: function(f) {
@@ -268,7 +269,7 @@ function beforeMapLoads() {
 
     agelimit = localStorage.getItem('agelimit');
 
-    if(!agelimit) {
+    if (!agelimit) {
         agelimit = agelimitDefault;
         localStorage.setItem('agelimit', agelimit);
     }
@@ -335,6 +336,56 @@ function afterMapLoads() {
         fadeoutManager(closeBookmark, bookmarkLife, e);
     });
     createAgeSlider(markers);
+
+
+    $(function() {
+        $.contextMenu({
+            selector: '.context-menu-one',
+            callback: function(key, options) {
+                var m = "clicked: " + key;
+                window.console && console.log(m) || alert(m);
+            },
+            items: {
+                "edit": {
+                    name: "Edit",
+                    icon: "edit"
+                },
+                "cut": {
+                    name: "Cut",
+                    icon: "cut"
+                },
+                copy: {
+                    name: "Copy",
+                    icon: "copy"
+                },
+                "paste": {
+                    name: "Paste",
+                    icon: "paste"
+                },
+                "delete": {
+                    name: "Delete",
+                    icon: "delete"
+                },
+                "sep1": "---------",
+                "quit": {
+                    name: "Quit",
+                    icon: function() {
+                        return 'context-menu-icon context-menu-icon-quit';
+                    }
+                }
+            }
+        });
+
+        $('.context-menu-one').on('click', function(e) {
+            console.log('clicked', this);
+        })
+    });
+
+    // //Right click on the map activated
+    // bootleaf.map.on('contextmenu', function(e) {
+    //     ctxmenu(e); // alert(e.latlng);
+    // });
+
 }
 
 function updateMarkers(agelimit) {
@@ -343,7 +394,8 @@ function updateMarkers(agelimit) {
         var age_hrs = (now() - ts) / 3600;
         if (age_hrs > -agelimit) {
             bootleaf.map.removeLayer(marker);
-        } else {
+        }
+        else {
             bootleaf.map.addLayer(marker);
         }
     });
@@ -378,7 +430,7 @@ function createAgeSlider(markers) {
                     return 'newer than: ' + -value + ' hours';
                 }
             }).on('change', function() {
-                updateMarkers( parseFloat($(this).val()));
+                updateMarkers(parseFloat($(this).val()));
             });
             L.DomEvent.disableClickPropagation(container);
 
