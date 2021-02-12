@@ -18,14 +18,16 @@ var SkewT = function(div) {
     var margin = {top: 10, right: 30, bottom: 10, left: 20}; //container margins
     var deg2rad = (Math.PI/180);
     var gradient = 55;
-    var steph = 1000;
     var tan;
     var basep = 1000;
     var topp = 100;
-    var steph = 1000;
+    var steph = atm.getElevation(topp)/20;
+    console.log(steph);
 
     var plines = [1000,900,800,700,600,500,400,300,200,100];
-    var pticks = [950,900,800,750,650,600,550,450,400,350,250,150];
+    var pticks = [], tickInterval=25;
+    for (let i=plines[0]+tickInterval; i>plines[plines.length-1]; i-=tickInterval)pticks.push(i);
+    console.log(pticks);
     var barbsize = 15;   /////
     // functions for Scales and axes. Note the inverted domain for the y-scale: bigger is up!
     var r = d3.scaleLinear().range([0,300]).domain([0,150]);
@@ -252,7 +254,9 @@ var SkewT = function(div) {
     }
 
     var drawToolTips = function(skewtlines) {
+
         var lines = skewtlines.reverse();
+        console.log(lines);
         // Draw tooltips
         var tmpcfocus = skewtgroup.append("g").attr("class", "focus tmpc").style("display", "none");
         tmpcfocus.append("circle").attr("r", 4);
@@ -263,10 +267,14 @@ var SkewT = function(div) {
         dwpcfocus.append("text").attr("x", -9).attr("text-anchor", "end").attr("dy", ".35em");
 
         var hghtfocus = skewtgroup.append("g").attr("class", "focus").style("display", "none");
-        hghtfocus.append("text").attr("x", 0).attr("text-anchor", "start").attr("dy", ".35em");
+        var hght1 = hghtfocus.append("text").attr("x", 0).attr("text-anchor", "start").attr("dy", ".35em");
+        var hght2 = hghtfocus.append("text").attr("x", 0).attr("text-anchor", "start").attr("dy", "-0.65em").style("fill","green");
 
         var wspdfocus = skewtgroup.append("g").attr("class", "focus windspeed").style("display", "none");
-        wspdfocus.append("text").attr("x", 0).attr("text-anchor", "start").attr("dy", ".35em");
+        var wspd1 = wspdfocus.append("text").attr("x", 0).attr("text-anchor", "start").attr("dy", ".35em");
+        var wspd2 = wspdfocus.append("text").attr("x", 0).attr("text-anchor", "start").attr("dy", "-0.65em").style("fill","red") ;
+
+        console.log(wspdfocus)
 
         container.append("rect")
             .attr("class", "overlay")
@@ -280,14 +288,22 @@ var SkewT = function(div) {
                 var d0 = lines[i - 1];
                 var d1 = lines[i];
                 var d = y0 - d0.press > d1.press - y0 ? d1 : d0;
+
+                console.log(d);
+
                 tmpcfocus.attr("transform", "translate(" + (x(d.temp) + (y(basep)-y(d.press))/tan)+ "," + y(d.press) + ")");
+                //dwpcfocus.attr("transform", "translate(" + (100) + "," +  (y(d.press)-50) + ")");
                 dwpcfocus.attr("transform", "translate(" + (x(d.dwpt) + (y(basep)-y(d.press))/tan)+ "," + y(d.press) + ")");
+
                 hghtfocus.attr("transform", "translate(0," + y(d.press) + ")");
-                tmpcfocus.select("text").text(Math.round(d.temp)+"°C");
-                dwpcfocus.select("text").text(Math.round(d.dwpt)+"°C");
-                hghtfocus.select("text").text("-- "+Math.round(d.hght)+" m"); 	//hgt or hghtagl ???
-                wspdfocus.attr("transform", "translate(" + (w-65)  + "," + y(d.press) + ")");
-                wspdfocus.select("text").text(Math.round(convert(d.wspd, unit)*10)/10 + " " + unit);
+                //tmpcfocus.select("text").text(Math.round(d.temp)+"C");
+                //dwpcfocus.select("text").text(Math.round(d.dwpt)+"C");
+                hght1.html("- "+Math.round(d.hght)); 	//hgt or hghtagl ???
+                hght2.html("&nbsp;&nbsp;&nbsp;"+Math.round(d.dwpt)+"C");
+
+                wspdfocus.attr("transform", "translate(" + (w-60)  + "," + y(d.press) + ")");
+                wspd1.html(Math.round(convert(d.wspd, unit)*10)/10 + " " + unit);
+                wspd2.html(Math.round(d.temp)+"C");
             });
     }
 
@@ -367,6 +383,9 @@ var SkewT = function(div) {
                 ranges.gradient.input.node().value = ranges.gradient.value = gradient = Math.atan(Math.tan(gradient*deg2rad) * pph/ph)/deg2rad;
                 ranges.gradient.valueDiv.text(Math.round(ranges.gradient.value));
             }
+             steph = atm.getElevation(topp)/20;
+
+
             //setVariables();
             resize();
         })

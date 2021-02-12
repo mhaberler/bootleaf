@@ -87,7 +87,7 @@
 
     .focus.tmpc circle { fill: red;   stroke: none; }
     .focus.dwpc circle { fill: green; stroke: none; }
-    .focus text { font-size: 12px; }
+    .focus text { font-size: 14px;  }
 
     .range-container{
         display:flex;
