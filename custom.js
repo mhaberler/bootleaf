@@ -219,6 +219,8 @@ function gotSummary(data) {
 
             geojsonMarkerOptions.fillColor = chroma_scale(1 - age_index / maxHrs);
             var marker = L.circleMarker(latlng, geojsonMarkerOptions);
+            marker.properties = {};
+            marker.properties.visible = false;
             markerList.push(marker);
             var content = "<b>" + feature.properties.name + "</b>" + "<br>  " + rounded_age + " hours old";
             if (isTouchDevice) {
@@ -346,10 +348,16 @@ function updateMarkers(agelimit) {
         var ts = marker.feature.properties.ascents[0].syn_timestamp;
         var age_hrs = (now() - ts) / 3600;
         if (age_hrs > -agelimit) {
-            bootleaf.map.removeLayer(marker);
+            if (marker.properties.visible) {
+                bootleaf.map.removeLayer(marker);
+                marker.properties.visible = false;
+            }
         }
         else {
-            bootleaf.map.addLayer(marker);
+            if (!marker.properties.visible) {
+                bootleaf.map.addLayer(marker);
+                marker.properties.visible = true;
+            }
         }
     });
     localStorage.setItem('agelimit', agelimit);
