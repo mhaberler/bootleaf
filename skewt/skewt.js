@@ -130,8 +130,9 @@ var SkewT = function(div) {
 
         // create array to plot dry adiabats
         var pIncrement=-50;
-        var pp = d3.range(basep,topp-50,pIncrement * (moving?4:1));
-        var dryad = d3.range(-100,200,10 * (moving?2:1));
+        var pp = moving? [basep, basep-(basep-topp)*0.5,  topp] : d3.range(basep,topp-50 ,pIncrement);
+
+        var dryad = d3.range(-100,200,10);
 
         var all = [];
 
@@ -287,7 +288,7 @@ var SkewT = function(div) {
                 var d1 = lines[i];
                 var d = y0 - d0.press > d1.press - y0 ? d1 : d0;
 
-                console.log(d);
+               // console.log(d);
 
                 tmpcfocus.attr("transform", "translate(" + (x(d.temp) + (y(basep)-y(d.press))/tan)+ "," + y(d.press) + ")");
                 dwpcfocus.attr("transform", "translate(" + (x(d.dwpt) + (y(basep)-y(d.press))/tan)+ "," + y(d.press) + ")");
@@ -308,7 +309,6 @@ var SkewT = function(div) {
     var parctrajLines;
     var drawParcelTraj = function(){
 
-        //console.log("drawParcelTraj");
         if(parctrajLines)parctrajLines.remove();
             let parcelTraj = atm.parcelTrajectory(
                 { level:data.map(e=>e.press), gh: data.map(e=>e.hght),  temp:  data.map(e=>e.temp+273.15) },
@@ -317,6 +317,9 @@ var SkewT = function(div) {
                 data[0].press,
                 data[0].dwpt+273.15
             )
+
+          //  console.log(parcelTraj);
+
             var parclinedata = parcelTraj?     //may be null
                 [[].concat(parcelTraj.dry||[],parcelTraj.moist||[]).map(e=>{return {parct:e[0]-273.15, press:e[1]}})]
                 :[];
@@ -352,10 +355,10 @@ var SkewT = function(div) {
 
         //skew-t stuff
         var skewtline = data.filter(function(d) { return (d.temp > -1000 && d.dwpt > -1000); });
-        if (skewtline.length>30 && moving){
+        if (skewtline.length>50 && moving){
             let prev=-1;
             skewtline=data.filter((e,i,a)=>{
-                let n=Math.floor(i*30/(a.length-1));
+                let n=Math.floor(i*50/(a.length-1));
                 if (n>prev){
                     prev=n;
                     return true;
@@ -427,11 +430,13 @@ var SkewT = function(div) {
     let ranges= {gradient:{min:0, max:85, step:5,  value:gradient},topp:{ min:100, max:900, step: 50, value:100}, parctemp:{val: 10, step:2, min:-50, max: 50}};
     const unit4range = p => p=="gradient"?"deg":p=="topp"?"hPa":"&#176;C";
     for (let p in ranges){
+
         let r=ranges[p];
         r.valueDiv = rangeContainer.append("div").attr("class","skewt-range-val").html(p=="gradient"?"Gradient:":p=="topp"?"Top P:":"Parcel T:");
         r.valueDiv = rangeContainer.append("div").attr("class","skewt-range-val").html(`${r.value} ${unit4range(p)}`);
         r.input = rangeContainer.append("input").attr("type","range").attr("min",r.min).attr("max",r.max).attr("step",r.step).attr("value",r.value).attr("class","skewt-ranges")
         .on("input",(a,b,c)=>{
+
             r.value=+c[0].value;
 
             if(p=="gradient") {
@@ -448,17 +453,24 @@ var SkewT = function(div) {
                 }
                 steph = atm.getElevation(topp)/20;
             }
+            r.valueDiv.html(`${r.value} ${unit4range(p)}`);
+
+            clearTimeout(moving);
+            moving=setTimeout(()=>{
+                moving=false;
+                resize();
+            },1000)
+
             if(p=="parctemp"){
                 parctemp = r.value;
                 drawParcelTraj();
             } else {
-                moving=true;
                 resize();
             }
 
-             r.valueDiv.html(`${r.value} ${unit4range(p)}`);
-
-        }).on("change",()=>{
+        })
+        /*
+        .on("change",()=>{
             //console.log("CHANGE");
             if (p!="parctemp"){
                 moving=false;
@@ -467,6 +479,7 @@ var SkewT = function(div) {
                 drawParcelTraj();
             }
         })
+        */
 
         if (p=="topp") rangeContainer.append("input").attr("type","checkbox").on("click",(a,b,e)=>{
             adjustGradient= e[0].checked;
