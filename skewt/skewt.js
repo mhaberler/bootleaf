@@ -18,6 +18,7 @@ var SkewT = function(div) {
     var margin = {top: 10, right: 30, bottom: 10, left: 20}; //container margins
     var deg2rad = (Math.PI/180);
     var gradient = 55;
+    var adjustGradient=false;
     var tan;
     var basep = 1000;
     var topp = 100;
@@ -67,7 +68,8 @@ var SkewT = function(div) {
     {
         switch(unit) {
             case "kt":
-                return msvalue*1.943844492;
+                //return msvalue*1.943844492;
+                return msvalue;   //wind is provided as kt by michael's program
             break;
             case "kmh":
                 return msvalue*3.6;
@@ -439,9 +441,11 @@ var SkewT = function(div) {
                 let pph=y(basep)-y(topp);
                 topp= r.value;
                 let ph=y(basep)-y(topp);
-                ranges.gradient.value = gradient = Math.atan(Math.tan(gradient*deg2rad) * pph/ph)/deg2rad;
-                ranges.gradient.input.node().value = 90-gradient;
-                ranges.gradient.valueDiv.html(`${Math.round(gradient)} ${unit4range("gradient")}`);
+                if(adjustGradient){
+                    ranges.gradient.value = gradient = Math.atan(Math.tan(gradient*deg2rad) * pph/ph)/deg2rad;
+                    ranges.gradient.input.node().value = 90-gradient;
+                    ranges.gradient.valueDiv.html(`${Math.round(gradient)} ${unit4range("gradient")}`);
+                }
                 steph = atm.getElevation(topp)/20;
             }
             if(p=="parctemp"){
@@ -464,8 +468,12 @@ var SkewT = function(div) {
             }
         })
 
+        if (p=="topp") rangeContainer.append("input").attr("type","checkbox").on("click",(a,b,e)=>{
+            adjustGradient= e[0].checked;
+        })
         rangeContainer.append("div").attr("class","flex-break");
     }
+
 
     var clear = function(s){
         skewtgroup.selectAll("path").remove(); //clear previous paths from skew
