@@ -92,8 +92,16 @@
     }
 
     .focus.tmpc circle { fill: red;   stroke: none; }
-    .focus.dwpc circle { fill: green; stroke: none; }
+    .focus.dwpc circle { fill: blue; stroke: none; }
     .focus text { font-size: 14px;  }
+
+    .skewt-wind-arrow{
+        alignment-baseline:middle;
+        text-anchor:middle;
+        fill:black;
+        font-size: 16px;
+        font-weight:bold;
+    }
 
     .range-container{
         display:flex;

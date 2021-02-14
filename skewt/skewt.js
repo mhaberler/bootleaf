@@ -264,12 +264,12 @@ var SkewT = function(div) {
 
         var hghtfocus = skewtgroup.append("g").attr("class", "focus").style("display", "none");
         var hght1 = hghtfocus.append("text").attr("x", 0).attr("text-anchor", "start").attr("dy", ".35em");
-        var hght2 = hghtfocus.append("text").attr("x", 0).attr("text-anchor", "start").attr("dy", "-0.65em").style("fill","green");
+        var hght2 = hghtfocus.append("text").attr("x", 0).attr("text-anchor", "start").attr("dy", "-0.65em").style("fill","blue");
 
         var wspdfocus = skewtgroup.append("g").attr("class", "focus windspeed").style("display", "none");
-        var wspd1 = wspdfocus.append("text").attr("x", 0).attr("text-anchor", "start").attr("dy", ".35em");
-        var wspd2 = wspdfocus.append("text").attr("x", 0).attr("text-anchor", "start").attr("dy", "-0.65em").style("fill","red") ;
-
+        var wspd1 = wspdfocus.append("text").attr("x", "0.8em").attr("text-anchor", "start").attr("dy", ".35em");
+        var wspd2 = wspdfocus.append("text").attr("x", "0.8em").attr("text-anchor", "start").attr("dy", "-0.65em").style("fill","red") ;
+        var wspd3 = wspdfocus.append("text").attr("class","skewt-wind-arrow").html("&#8679;") ;
         //console.log(wspdfocus)
 
         container.append("rect")
@@ -285,7 +285,7 @@ var SkewT = function(div) {
                 var d1 = lines[i];
                 var d = y0 - d0.press > d1.press - y0 ? d1 : d0;
 
-                //console.log(d);
+                console.log(d);
 
                 tmpcfocus.attr("transform", "translate(" + (x(d.temp) + (y(basep)-y(d.press))/tan)+ "," + y(d.press) + ")");
                 dwpcfocus.attr("transform", "translate(" + (x(d.dwpt) + (y(basep)-y(d.press))/tan)+ "," + y(d.press) + ")");
@@ -297,6 +297,8 @@ var SkewT = function(div) {
                 wspdfocus.attr("transform", "translate(" + (w-60)  + "," + y(d.press) + ")");
                 wspd1.html(Math.round(convert(d.wspd, unit)*10)/10 + " " + unit);
                 wspd2.html(Math.round(d.temp)+"&#176;C");
+                wspd3.style("transform",`rotate(${d.wdir}deg)`).style("background-color","green");
+
             });
     }
 
