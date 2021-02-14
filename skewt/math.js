@@ -19,6 +19,7 @@ window.skewtMath=
     // Sampling at at targetXs with linear interpolation
     // xs and ys must have the same length.
     sampleAt:  function(xs, ys, targetXs) {
+        //console.log(xs.length,ys.length);
       const descOrder = xs[0] > xs[1];
       return targetXs.map((tx) => {
         let index = xs.findIndex((x) => (descOrder ? x <= tx : x >= tx));
@@ -27,7 +28,7 @@ window.skewtMath=
         } else if (index == 0) {
           index = 1;
         }
-        return linearInterpolate(xs[index - 1], ys[index - 1], xs[index], ys[index], tx);
+        return this.linearInterpolate(xs[index - 1], ys[index - 1], xs[index], ys[index], tx);
       });
     },
 
@@ -42,8 +43,8 @@ window.skewtMath=
         .filter((x) => x >= min && x <= max)
         .sort((a, b) => (Number(a) > Number(b) ? 1 : -1));
       // Interpolate the lines for all the points of that intersection
-      const iy1s = sampleAt(x1s, y1s, xs);
-      const iy2s = sampleAt(x2s, y2s, xs);
+      const iy1s = this.sampleAt(x1s, y1s, xs);
+      const iy2s = this.sampleAt(x2s, y2s, xs);
       // Check if each segment intersect
       for (let index = 0; index < xs.length - 1; index++) {
         const y11 = iy1s[index];
@@ -72,15 +73,15 @@ window.skewtMath=
     },
 
     scaleLinear:  function(from, to) {
-      const scale = (v) => sampleAt(from, to, [v])[0];
-      scale.invert = (v) => sampleAt(to, from, [v])[0];
+      const scale = (v) => this.sampleAt(from, to, [v])[0];
+      scale.invert = (v) => this.sampleAt(to, from, [v])[0];
       return scale;
     },
 
     scaleLog:  function(from, to) {
       from = from.map(Math.log);
-      const scale = (v) => sampleAt(from, to, [Math.log(v)])[0];
-      scale.invert = (v) => Math.exp(sampleAt(to, from, [v])[0]);
+      const scale = (v) => this.sampleAt(from, to, [Math.log(v)])[0];
+      scale.invert = (v) => Math.exp(this.sampleAt(to, from, [v])[0]);
       return scale;
     },
 

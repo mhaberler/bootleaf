@@ -41,9 +41,15 @@
     }
     .dwpt {
       fill: none;
+      stroke: blue;
+      stroke-width: 3px;
+    }
+    .parcel {
+      fill: none;
       stroke: green;
       stroke-width: 3px;
     }
+
     .skline   { stroke-width: 1.8px; opacity: 0.8;}
     .mean     { stroke-width: 2.5px; }
 

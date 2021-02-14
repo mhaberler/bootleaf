@@ -69,6 +69,9 @@
         },
 
         parcelTrajectory:   function(params, steps, sfcT, sfcP, sfcDewpoint) {
+
+
+          //  console.log(params,  steps,  sfcT,   sfcP,  sfcDewpoint);
           const parcel = {};
           const dryGhs = [];
           const dryPressures = [];
