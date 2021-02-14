@@ -387,7 +387,7 @@ var SkewT = function(div) {
         var lastH=-500;
 
         var barbs = skewtline.filter(function(d) {  if (d.hght>lastH+steph) lastH=d.hght; return (d.hght==lastH && d.wdir >= 0 && d.wspd >= 0 && d.press >= topp); });
-        
+
         ///mah
         /*
             var barbs = skewtline.filter(function(d) {
@@ -428,10 +428,11 @@ var SkewT = function(div) {
         r.valueDiv = rangeContainer.append("div").attr("class","skewt-range-val").html(`${r.value} ${unit4range(p)}`);
         r.input = rangeContainer.append("input").attr("type","range").attr("min",r.min).attr("max",r.max).attr("step",r.step).attr("value",r.value).attr("class","skewt-ranges")
         .on("input",(a,b,c)=>{
-            console.log(p);
             r.value=+c[0].value;
-            r.valueDiv.html(`${r.value} ${unit4range(p)}`);
-            if(p=="gradient") gradient = 90-r.value;
+
+            if(p=="gradient") {
+                gradient = r.value = 90-r.value;;
+            }
             if(p=="topp"){
                 let pph=y(basep)-y(topp);
                 topp= r.value;
@@ -448,8 +449,11 @@ var SkewT = function(div) {
                 moving=true;
                 resize();
             }
+
+             r.valueDiv.html(`${r.value} ${unit4range(p)}`);
+
         }).on("change",()=>{
-            console.log("CHANGE");
+            //console.log("CHANGE");
             if (p!="parctemp"){
                 moving=false;
                 resize();
