@@ -271,7 +271,7 @@ var SkewT = function(div) {
         var wspdfocus = skewtgroup.append("g").attr("class", "focus windspeed").style("display", "none");
         var wspd1 = wspdfocus.append("text").attr("x", "0.8em").attr("text-anchor", "start").attr("dy", ".35em");
         var wspd2 = wspdfocus.append("text").attr("x", "0.8em").attr("text-anchor", "start").attr("dy", "-0.65em").style("fill","red") ;
-        var wspd3 = wspdfocus.append("text").attr("class","skewt-wind-arrow").html("&#8679;") ;
+        var wspd3 = wspdfocus.append("text").attr("class","skewt-wind-arrow").html("&#8681;") ;
         //console.log(wspdfocus)
 
         container.append("rect")
