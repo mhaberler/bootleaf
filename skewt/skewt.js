@@ -211,7 +211,7 @@ var SkewT = function(div) {
     }
 
     var makeBarbTemplates = function(){
-        var speeds = d3.range(5,105,5);
+        var speeds = d3.range(5,205,5);
         var barbdef = container.append('defs')
         speeds.forEach(function(d) {
             var thisbarb = barbdef.append('g').attr('id', 'barb'+d);
@@ -383,8 +383,22 @@ var SkewT = function(div) {
         }
 
         //barbs stuff
+        var stepH = 500;
         var lastH=-500;
+
         var barbs = skewtline.filter(function(d) {  if (d.hght>lastH+steph) lastH=d.hght; return (d.hght==lastH && d.wdir >= 0 && d.wspd >= 0 && d.press >= topp); });
+        
+        ///mah
+        /*
+            var barbs = skewtline.filter(function(d) {
+            if (d.hght > lastH) {
+                var result =  (d.hght > lastH && d.wdir >= 0 && d.wspd >= 0 && d.press >= topp);
+                lastH = lastH + stepH;
+                // if (result)
+                //     console.log( d.press, d.hght, lastH );
+                return result;
+            }})*/
+        ///
         var allbarbs = barbgroup.selectAll("barbs")
             .data(barbs).enter().append("use")
             .attr("xlink:href", function (d) { return "#barb"+Math.round(convert(d.wspd, "kt")/5)*5; }) // 0,5,10,15,... always in kt
