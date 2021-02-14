@@ -200,6 +200,8 @@ function markerClicked(l) {
     });
     selectedMarker = marker;
     plotStation(marker.feature, 0);
+    //bootleaf.setView(marker.getLatLng(),5);
+    bootleaf.map.panTo(marker.getLatLng());
 }
 
 function findBUFR(value, index, array) {
