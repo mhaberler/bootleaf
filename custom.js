@@ -13,7 +13,7 @@ var maxHrs = 48;
 var agelimit;
 var agelimitDefault = -24;
 
-var geojsonMarkerOptions = {
+var MarkerOptions = {
     radius: 10,
     color: "#000",
     weight: 1,
@@ -21,6 +21,8 @@ var geojsonMarkerOptions = {
     fillOpacity: 0.8,
     className: "context-menu-marker"
 };
+
+var markerSelectedColor = "OrangeRed";
 
 var viridisStops = ['#440154', '#482777', '#3F4A8A', '#31678E', '#26838F', '#1F9D8A', '#6CCE5A', '#B6DE2B', '#FEE825'];
 var chroma_scale = chroma.scale(viridisStops);
@@ -171,8 +173,33 @@ function plotStation(feature, index) {
     }
 }
 
-function clicked(l) {
-    plotStation(l.target.feature, 0);
+// sidebar is being closed - deselect marker
+$("#sidebar-hide-btn").click(function() {
+    if (selectedMarker) {
+        selectedMarker.setStyle({
+            fillColor: selectedMarker.properties.color,
+        });
+        selectedMarker = null;
+    }
+    return false;
+});
+
+var selectedMarker = null;
+
+function markerClicked(l) {
+    if (selectedMarker) {
+        // restore
+        selectedMarker.setStyle({
+            fillColor: selectedMarker.properties.color,
+        });
+    }
+    marker = l.target;
+    marker.properties.color = marker.options.fillColor;
+    marker.setStyle({
+        fillColor: markerSelectedColor
+    });
+    selectedMarker = marker;
+    plotStation(marker.feature, 0);
 }
 
 function findBUFR(value, index, array) {
@@ -216,21 +243,21 @@ function gotSummary(data) {
             var age_index = Math.round(Math.min(age_hrs, maxHrs - 1));
             age_index = Math.max(age_index, 0);
             var rounded_age = Math.round(age_hrs * 10) / 10;
+            MarkerOptions.fillColor = chroma_scale(1 - age_index / maxHrs);
 
-            geojsonMarkerOptions.fillColor = chroma_scale(1 - age_index / maxHrs);
-            var marker = L.circleMarker(latlng, geojsonMarkerOptions);
+            var marker = L.circleMarker(latlng, MarkerOptions);
             marker.properties = {};
             marker.properties.visible = false;
             markerList.push(marker);
             var content = "<b>" + feature.properties.name + "</b>" + "<br>  " + rounded_age + " hours old";
             if (isTouchDevice) {
-                marker.on('click', clicked);
+                marker.on('click', markerClicked);
             }
             else {
                 marker.bindTooltip(content, {
                         className: ascent.source + 'CSSClass'
                     }).openTooltip()
-                    .on('click', clicked);
+                    .on('click', markerClicked);
                 //                        .on('mouseover', mouseover);
             }
             return marker;
