@@ -1,6 +1,7 @@
 
 //import * as atm from './atmosphere.js';
 
+////Original code from:
 /**
  * SkewT v1.1.0
  * 2016 David Félix - dfelix@live.com.pt
@@ -22,6 +23,7 @@ var SkewT = function(div) {
     var tan;
     var basep = 1000;
     var topp = 100;
+    var midtemp=0, temprange=50;
     var parctemp;
     var steph = atm.getElevation(topp)/20;
     var moving = false;
@@ -29,8 +31,7 @@ var SkewT = function(div) {
 
     var plines = [1000,900,800,700,600,500,400,300,200,100];
     var pticks = [], tickInterval=25;
-    for (let i=plines[0]+tickInterval; i>plines[plines.length-1]; i-=tickInterval)pticks.push(i);
-    console.log(pticks);
+    for (let i=plines[0]+tickInterval; i>plines[plines.length-1]; i-=tickInterval) pticks.push(i);
     var barbsize = 15;   /////
     // functions for Scales and axes. Note the inverted domain for the y-scale: bigger is up!
     var r = d3.scaleLinear().range([0,300]).domain([0,150]);
@@ -57,7 +58,7 @@ var SkewT = function(div) {
         w = width - margin.left - margin.right;
         h = width - margin.top - margin.bottom;
         tan = Math.tan((gradient || 55) *deg2rad);
-        x = d3.scaleLinear().range([0, w]).domain([-45,50]);
+        x = d3.scaleLinear().range([0, w]).domain([midtemp-temprange , midtemp+temprange]);
         y = d3.scaleLog().range([0, h]).domain([topp, basep]);
         xAxis = d3.axisBottom(x).tickSize(0,0).ticks(10);//.orient("bottom");
         yAxis = d3.axisLeft(y).tickSize(0,0).tickValues(plines).tickFormat(d3.format(".0d"));//.orient("left");
@@ -108,13 +109,13 @@ var SkewT = function(div) {
 
         // Skewed temperature lines
         lines.temp = skewtbg.selectAll("templine")
-        .data(d3.range(-100,45,10))
+        .data(d3.scaleLinear().domain([midtemp-temprange*2,midtemp+temprange]).ticks(15))
         .enter().append("line")
         .attr("x1", d => x(d)-0.5 + (y(basep)-y(topp))/tan)
         .attr("x2", d => x(d)-0.5)
         .attr("y1", 0)
         .attr("y2", h)
-        .attr("class", d => d == 0 ?  "tempzero": "templine")
+        .attr("class", (d => d == 0 ?  "tempzero": "templine") + ` ${buttons["Temp"].hi?"highlight-line":""}`)
         .attr("clip-path", "url(#clipper)");
         //.attr("transform", "translate(0," + h + ") skewX(-30)");
 
@@ -126,13 +127,13 @@ var SkewT = function(div) {
         .attr("x2", w)
         .attr("y1", y )
         .attr("y2", y)
-        .attr("class", "pressure");
+        .attr("class", `pressure ${buttons["Pressure"].hi?"highlight-line":""}`);
 
         // create array to plot dry adiabats
         var pIncrement=-50;
-        var pp = moving? [basep, basep-(basep-topp)*0.5,  topp] : d3.range(basep,topp-50 ,pIncrement);
+        var pp = moving? [basep, basep-(basep-topp)*0.25,basep-(basep-topp)*0.5,basep-(basep-topp)*0.75, topp] : d3.range(basep,topp-50 ,pIncrement);
 
-        var dryad = d3.range(-100,200,10);
+        var dryad = d3.scaleLinear().domain([midtemp-temprange*3,midtemp+temprange*3]).ticks(30);
 
         var all = [];
 
@@ -156,7 +157,7 @@ var SkewT = function(div) {
         lines.dryadiabat = skewtbg.selectAll("dryadiabatline")
         .data(all)
         .enter().append("path")
-        .attr("class", "dryadiabat")
+        .attr("class", `dryadiabat  ${buttons["Dry Adiabat"].hi?"highlight-line":""}` )
         .attr("clip-path", "url(#clipper)")
         .attr("d", drylineFx);
 
@@ -165,7 +166,7 @@ var SkewT = function(div) {
         var moistlineFx = d3.line()
             .curve(d3.curveLinear)
             .x(function(d,i) {
-                temp= i==0? 273.15 + d : (temp + atm.moistGradientT(pp[i], temp) * pIncrement)
+                temp= i==0? 273.15 + d : ((temp + atm.moistGradientT(pp[i], temp) * (moving?(topp-basep)/4:pIncrement)) )
                 return x(temp - 273.15) + (y(basep)-y(pp[i]))/tan;
             })
             .y(function(d,i) { return y(pp[i])} );
@@ -175,7 +176,7 @@ var SkewT = function(div) {
         lines.moistadiabat = skewtbg.selectAll("moistadiabatline")
         .data(all)
         .enter().append("path")
-        .attr("class", "moistadiabat")
+        .attr("class", `moistadiabat ${buttons["Moist Adiabat"].hi?"highlight-line":""}`)
         .attr("clip-path", "url(#clipper)")
         .attr("d", moistlineFx);
 
@@ -195,7 +196,7 @@ var SkewT = function(div) {
         lines.isohume = skewtbg.selectAll("isohumeline")
         .data(all)
         .enter().append("path")
-        .attr("class", "isohume")
+        .attr("class", `isohume ${buttons["Isohume"].hi?"highlight-line":""}` )
         .attr("clip-path", "url(#clipper)")
         .attr("d", isohumeFx);
 
@@ -300,7 +301,7 @@ var SkewT = function(div) {
                 wspdfocus.attr("transform", "translate(" + (w-60)  + "," + y(d.press) + ")");
                 wspd1.html(Math.round(convert(d.wspd, unit)*10)/10 + " " + unit);
                 wspd2.html(Math.round(d.temp)+"&#176;C");
-                wspd3.style("transform",`rotate(${d.wdir}deg)`).style("background-color","green");
+                wspd3.style("transform",`rotate(${d.wdir}deg)`);
 
             });
     }
@@ -336,6 +337,9 @@ var SkewT = function(div) {
             //console.log("PARCEL",parcelTraj);
             //console.log(parctrajLines);
     }
+
+
+
 
     var plot = function(s){
         skewtgroup.selectAll("path").remove(); //clear previous paths from skew
@@ -416,23 +420,24 @@ var SkewT = function(div) {
     }
 
     //controls
-    let buttons = [{name:"Dry Adiabat"},{name:"Moist Adiabat"},{name:"Isohume"},{name:"Temp"},{name:"Pressure"}];
-    buttons.forEach(b=>{
+    var buttons = {"Dry Adiabat":{},"Moist Adiabat":{},"Isohume":{},"Temp":{},"Pressure":{}};
+    for (let p in buttons){
+        let b= buttons[p];
         b.hi=false;
-        b.el=controls.append("div").attr("class","buttons").text(b.name).on("click", ()=>{
+        b.el=controls.append("div").attr("class","buttons").text(p).on("click", ()=>{
             b.hi=!b.hi;
             b.el.node().classList[b.hi?"add":"remove"]("clicked");
-            let line=b.name.replace(" ","").toLowerCase();
+            let line=p.replace(" ","").toLowerCase();
             lines[line]._groups[0].forEach(p=>p.classList[b.hi?"add":"remove"]("highlight-line"));
         })
-    })
+    };
 
-    let ranges= {gradient:{min:0, max:85, step:5,  value:gradient},topp:{ min:100, max:900, step: 50, value:100}, parctemp:{val: 10, step:2, min:-50, max: 50}};
+    let ranges= {gradient:{min:0, max:85, step:5,  value:gradient},topp:{ min:100, max:900, step: 50, value:100}, midtemp:{value:0, step:2, min:-50, max:50}, parctemp:{value: 10, step:2, min:-50, max: 50}};
     const unit4range = p => p=="gradient"?"deg":p=="topp"?"hPa":"&#176;C";
     for (let p in ranges){
 
         let r=ranges[p];
-        r.valueDiv = rangeContainer.append("div").attr("class","skewt-range-val").html(p=="gradient"?"Gradient:":p=="topp"?"Top P:":"Parcel T:");
+        r.valueDiv = rangeContainer.append("div").attr("class","skewt-range-val").html(p=="gradient"?"Gradient:":p=="topp"?"Top P:":p=="parctemp"?"Parcel T:":"Mid Temp");
         r.valueDiv = rangeContainer.append("div").attr("class","skewt-range-val").html(`${r.value} ${unit4range(p)}`);
         r.input = rangeContainer.append("input").attr("type","range").attr("min",r.min).attr("max",r.max).attr("step",r.step).attr("value",r.value).attr("class","skewt-ranges")
         .on("input",(a,b,c)=>{
@@ -446,12 +451,21 @@ var SkewT = function(div) {
                 let pph=y(basep)-y(topp);
                 topp= r.value;
                 let ph=y(basep)-y(topp);
+                pIncrement=topp>500?25:50;
                 if(adjustGradient){
                     ranges.gradient.value = gradient = Math.atan(Math.tan(gradient*deg2rad) * pph/ph)/deg2rad;
                     ranges.gradient.input.node().value = 90-gradient;
                     ranges.gradient.valueDiv.html(`${Math.round(gradient)} ${unit4range("gradient")}`);
+                } else {
+                    temprange*= ph/pph;
+                    //let midtemp=0;//getMidTemp(topp);
+                    //mintemp=midtemp-trange/2; maxtemp=midtemp+trange/2;
+                    setVariables();
                 }
                 steph = atm.getElevation(topp)/20;
+            }
+            if(p=="midtemp"){
+                midtemp = r.value = -r.value;
             }
             r.valueDiv.html(`${r.value} ${unit4range(p)}`);
 
