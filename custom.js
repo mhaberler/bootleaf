@@ -6,6 +6,7 @@ var markers = null;
 var saveMemory = isTouchDevice;
 var stations = {}; // features indexed by station_id
 var markerList = [];
+var markerGroups = [];
 let zeroK = 273.15;
 let drawAscents = 1;
 var bookmarkLife = 2000;
@@ -73,7 +74,6 @@ function plotSkewT(geojson) {
         };
 
         if ((typeof p.wind_u === "undefined") || (typeof p.wind_u === "undefined")) {
-            // if (!p.wind_u || !p.wind_u)
             data.push(sample);
             continue;
         }
@@ -97,21 +97,21 @@ function drawpath(feature) {
     L.polyline(lineCoordinate, path_colors[path_source]).addTo(bootleaf.map);
 }
 
-function mouseover(l) {
-    var ascents = l.target.feature.properties.ascents;
-
-    for (var i in ascents) {
-        var a = ascents[i];
-        if (i >= drawAscents) {
-            break;
-        }
-        if (!a.hasOwnProperty('data')) {
-            var p = datapath + a.path;
-            l.index = i;
-            loadAscent(l, p, i, drawpath);
-        }
-    }
-}
+// function mouseover(l) {
+//     var ascents = l.target.feature.properties.ascents;
+//
+//     for (var i in ascents) {
+//         var a = ascents[i];
+//         if (i >= drawAscents) {
+//             break;
+//         }
+//         if (!a.hasOwnProperty('data')) {
+//             var p = datapath + a.path;
+//             l.index = i;
+//             loadAscent(l, p, i, drawpath);
+//         }
+//     }
+// }
 
 var skewt = new SkewT('#sidebarContents');
 
@@ -200,7 +200,7 @@ function markerClicked(l) {
     });
     selectedMarker = marker;
     plotStation(marker.feature, 0);
-    //bootleaf.setView(marker.getLatLng(),5);
+    // this pan should happen only after the sidebar is visible
     bootleaf.map.panTo(marker.getLatLng());
 }
 
@@ -248,9 +248,14 @@ function gotSummary(data) {
             MarkerOptions.fillColor = chroma_scale(1 - age_index / maxHrs);
 
             var marker = L.circleMarker(latlng, MarkerOptions);
+            var layergroup = L.layerGroup([marker]);
+
             marker.properties = {};
             marker.properties.visible = false;
+
             markerList.push(marker);
+            markerGroups.push(layergroup);
+
             var content = "<b>" + feature.properties.name + "</b>" + "<br>  " + rounded_age + " hours old";
             if (isTouchDevice) {
                 marker.on('click', markerClicked);
@@ -367,24 +372,29 @@ function afterMapLoads() {
         fadeoutManager(closeBookmark, bookmarkLife, e);
     });
     createAgeSlider(markers);
-
     createContextMenus();
-
 }
 
 function updateMarkers(agelimit) {
-    markerList.forEach(function(marker, index) {
+    markerGroups.forEach(function(group, index) {
+        var marker;
+        for(var layer of group.getLayers()) {
+            if (layer instanceof L.CircleMarker) {
+                marker = layer;
+                break;
+            }
+        };
         var ts = marker.feature.properties.ascents[0].syn_timestamp;
         var age_hrs = (now() - ts) / 3600;
         if (age_hrs > -agelimit) {
             if (marker.properties.visible) {
-                bootleaf.map.removeLayer(marker);
+                bootleaf.map.removeLayer(group);
                 marker.properties.visible = false;
             }
         }
         else {
             if (!marker.properties.visible) {
-                bootleaf.map.addLayer(marker);
+                bootleaf.map.addLayer(group);
                 marker.properties.visible = true;
             }
         }
