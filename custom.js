@@ -60,7 +60,7 @@ function round3(value) {
 function plotSkewT(geojson) {
     var data = [];
     var pscale = 1.;
-    if (geojson.properties.source == 'BUFR')
+    if (geojson.properties.fmt < 2)
         pscale = 0.01;
 
     for (var i in geojson.features) {
