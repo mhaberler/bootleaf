@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <!-- Google Analytics -->
-    <!-- Replace UA-XXXXX-X with your Tracking-ID obtained from Google Analytics and remove the comments if you want to use Google Analytics
+  <!-- Google Analytics -->
+  <!-- Replace UA-XXXXX-X with your Tracking-ID obtained from Google Analytics and remove the comments if you want to use Google Analytics
          If compliance with EU's GDPR is necessary, consider the anonymize_ip parameter and an Opt-Out-Cookie.
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-XXXXX-X"></script>
     <script>
@@ -13,165 +14,183 @@
       gtag('config', 'UA-XXXXX-X');
     </script>
     -->
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#000000">
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <title>Radiosonde</title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#000000">
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <title>Radiosonde</title>
 
-    <!-- required libraries -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.0/css/bootstrap.min.css"
-          integrity="sha384-SI27wrMjH3ZZ89r4o+fGIJtnzkAnFs3E4qz9DIYioCQ5l9Rd/7UAa8DHcaL8jkWt" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="./src/plugins/datatables/datatables.min.css"/>
-    <link rel="stylesheet" href="./src/plugins/datatables/buttons.dataTables.min.css"/>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
-        integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
-        crossorigin=""/>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.css">
-    <link rel="stylesheet" href="./src/plugins/growl/stylesheets/jquery.growl.css"/>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.2/leaflet.draw.css"/>
+  <!-- required libraries -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.0/css/bootstrap.min.css" integrity="sha384-SI27wrMjH3ZZ89r4o+fGIJtnzkAnFs3E4qz9DIYioCQ5l9Rd/7UAa8DHcaL8jkWt" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="./src/plugins/datatables/datatables.min.css" />
+  <link rel="stylesheet" href="./src/plugins/datatables/buttons.dataTables.min.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin="" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.css">
+  <link rel="stylesheet" href="./src/plugins/growl/stylesheets/jquery.growl.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.2/leaflet.draw.css" />
 
-    <link rel="stylesheet" href="./src/css/bootleaf.css">
+  <link rel="stylesheet" href="./src/css/bootleaf.css">
 
-        <!-- optional libraries - comment out any libraries which are not being used to improve page load times -->
-        <!-- <script src="./src/plugins/bing/leaflet-bing-layer.js"></script> -->
+  <!-- optional libraries - comment out any libraries which are not being used to improve page load times -->
+  <!-- <script src="./src/plugins/bing/leaflet-bing-layer.js"></script> -->
 
 
-    <!-- <link rel="stylesheet"
+  <!-- <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.1.0/MarkerCluster.Default.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.1.0/MarkerCluster.css"> -->
-    <link rel="stylesheet" href="./src/plugins/geocoders/Control.Geocoder.css"/>
-    <link rel="stylesheet" href="./src/plugins/bookmarks/leaflet.bookmarks.css"/>
-    <!-- <link rel="stylesheet" href="./src/plugins/leaflet-history/leaflet-history.css"/> -->
+  <link rel="stylesheet" href="./src/plugins/geocoders/Control.Geocoder.css" />
+  <link rel="stylesheet" href="./src/plugins/bookmarks/leaflet.bookmarks.css" />
+  <!-- <link rel="stylesheet" href="./src/plugins/leaflet-history/leaflet-history.css"/> -->
 
-    <!-- Customise the styles used in this map -->
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="style-mah.css">
+  <!-- Customise the styles used in this map -->
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style-mah.css">
 
-    <!-- SkewT support -->
-    <script src="https://d3js.org/d3.v5.js"></script>
-    <script src="https://unpkg.com/skewt-plus/dist/bundle.js"></script>
+  <!-- SkewT support -->
+  <script src="https://d3js.org/d3.v5.js"></script>
+  <script src="https://unpkg.com/skewt-plus/dist/bundle.js"></script>
 
-    <!-- favicons -->
-    <link rel="apple-touch-icon" sizes="76x76" href="./src/img/favicon-76.png">
-    <link rel="apple-touch-icon" sizes="120x120" href="./src/img/favicon-120.png">
-    <link rel="apple-touch-icon" sizes="152x152" href="./src/img/favicon-152.png">
-    <link rel="icon" sizes="196x196" href="./src/img/favicon-196.png">
-    <link rel="icon" type="image/x-icon" href="./src/img/favicon.ico">
+  <!-- favicons -->
+  <link rel="apple-touch-icon" sizes="76x76" href="./src/img/favicon-76.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="./src/img/favicon-120.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="./src/img/favicon-152.png">
+  <link rel="icon" sizes="196x196" href="./src/img/favicon-196.png">
+  <link rel="icon" type="image/x-icon" href="./src/img/favicon.ico">
 </head>
 
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
 
     <a class="navbar-brand" href="https://radiosonde.mah.priv.at/app">
-        Radiosonde
+      Radiosonde
     </a>
 
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
     </button>
 
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto">
-            <li class="nav-item active">
-                <a class="nav-link" href="#" data-toggle="collapse" data-target=".navbar-collapse.in" id="about-btn">
-                    <i class="fa fa-question-circle white"></i>&nbsp;&nbsp;About </a>
-            </li>
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="toolsDrop" role="button" data-toggle="dropdown"
-                   aria-haspopup="true" aria-expanded="false">
-                    <i class="fa fa-wrench white"></i>&nbsp;&nbsp;Tools</b>
-                </a>
-                <div class="dropdown-menu" aria-labelledby="toolsDrop">
-                    <a href="#" class="dropdown-item" data-toggle="collapse" data-target=".navbar-collapse.in" id="full-extent-btn">
-                        <i class="fa fa-arrows-alt"></i>&nbsp;&nbsp;Zoom To Full Extent
-                    </a>
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item active">
+          <a class="nav-link" href="#" data-toggle="collapse" data-target=".navbar-collapse.in" id="about-btn">
+            <i class="fa fa-question-circle white"></i>&nbsp;&nbsp;About </a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="toolsDrop" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="fa fa-wrench white"></i>&nbsp;&nbsp;Tools</b>
+          </a>
+          <div class="dropdown-menu" aria-labelledby="toolsDrop">
+            <a href="#" class="dropdown-item" data-toggle="collapse" data-target=".navbar-collapse.in" id="full-extent-btn">
+              <i class="fa fa-arrows-alt"></i>&nbsp;&nbsp;Zoom To Full Extent
+            </a>
 
-                    <a href="#" id="history-btn" class="dropdown-item mapTools" data-tool="history">
-                        <i class="fa fa-info-circle"></i>&nbsp;&nbsp;Station history
-                    </a>
+            <a href="#" id="history-btn" class="dropdown-item mapTools" data-tool="history">
+              <i class="fa fa-info-circle"></i>&nbsp;&nbsp;Station history
+            </a>
 
 
-                    <!-- <a href="#" id="queryWidget-btn" class="dropdown-item mapTools" data-tool="queryWidget">
+            <!-- <a href="#" id="queryWidget-btn" class="dropdown-item mapTools" data-tool="queryWidget">
                         <i class="fa fa-question-circle"></i>&nbsp;&nbsp;Query Widget
                     </a> -->
 
 
-                    <!-- <a href="#" id="filterWidget-btn" class="dropdown-item mapTools" data-tool="filterWidget">
+            <!-- <a href="#" id="filterWidget-btn" class="dropdown-item mapTools" data-tool="filterWidget">
                         <i class="fa fa-filter"></i>&nbsp;&nbsp;Filter Widget
                     </a>
                     <a href="#" id="coordinates-btn" class="dropdown-item mapTools" data-tool="coordinates">
                         <i class="fa fa-dot-circle-o"></i>&nbsp;&nbsp;Get map coordinates
                     </a>
                      -->
-                    <a href="#" id="share-btn" class="dropdown-item mapTools" data-tool="share">
-                        <i class="fa fa-share"></i>&nbsp;&nbsp;Share map
-                    </a>
-                </div>
-            </li>
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="basemapDropdown" role="button" data-toggle="dropdown"
-                   aria-haspopup="true" aria-expanded="false">
-                    <i class="fa fa-globe white"></i>&nbsp;&nbsp;Basemaps
-                </a>
-                <div class="dropdown-menu" aria-labelledby="navbarDropdown" id="ulBasemap">
+            <a href="#" id="share-btn" class="dropdown-item mapTools" data-tool="share">
+              <i class="fa fa-share"></i>&nbsp;&nbsp;Share map
+            </a>
+          </div>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="basemapDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="fa fa-globe white"></i>&nbsp;&nbsp;Basemaps
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown" id="ulBasemap">
 
-                </div>
-            </li>
-        </ul>
+          </div>
+        </li>
+      </ul>
     </div>
-</nav>
+  </nav>
 
-<div id="container">
+  <div id="container">
     <div id="sidebar" class="hidden-xs hidden-sm">
-        <div class="sidebar-wrapper">
-            <div class="card" id="pnlSidebar">
-                <div class="card-header">
-                    <h5 class="card-title"><span id="sidebarTitle">Sidebar</span>
-                        <button type="button" class="btn btn-xs btn-default pull-right" id="sidebar-hide-btn">
-                            <i class="fa fa-chevron-left"></i>
-                        </button>
-                    </h5>
-                    <h6 class="card-title"><span id="sidebarSubTitle">Sidebar</span>
-                    </h6>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                          <div id="sidebarContents" class="col-xs-12 col-md-12 skew-t"  style="    width: 400px">
-                            <!-- contents are inserted programatically by the current active tool -->
-                          </div>
-                          <div id="box1"  class="col-xs-6 col-md-6">  </div>
-                          <div id="box2"  class="col-xs-6 col-md-6">  </div>
-                          <!-- <div id="box3"  class="col-xs-4 col-md-4">  </div> -->
+      <div class="sidebar-wrapper">
+        <div class="card" id="pnlSidebar">
+          <div class="card-header">
+            <div class="row">
 
-                          <div id="sidebarBottom" class="col-xs-12 col-md-12"  style="    width: 400px">
-                             <!-- contents are inserted programatically by the current active tool -->
-                         </div>
-                    </div>
+              <h5 class="card-title col-xs-12 col-md-12"><span id="sidebarTitle">Sidebar</span>
+                <button type="button" class="btn btn-xs btn-default pull-right" id="sidebar-hide-btn">
+                  <i class="fa fa-chevron-left"></i>
+                </button>
+              </h5>
+              <h7 class="card-title col-xs-6 col-md-6"><span id="sidebarSubTitle">Sidebar</span>
+              </h7>
+
+
+
+              <!-- <h7 class="card-title col-xs-6 col-md-6"><span id="sidebarSubTitleRight">Sidebar</span>
+              </h7> -->
+
+              <div class="dropdown card-title col-xs-6 col-md-6">
+                <button class="btn btn-secondary dropdown-toggle " type="button" id="sidebarSubTitleRight" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Dropdown button
+                </button>
+                <div class="dropdown-menu" aria-labelledby="sidebarSubTitleRight" id="history">
+                  <!-- <a class="dropdown-item" href="#">Action</a>
+                  <a class="dropdown-item" href="#">Another action</a>
+                  <a class="dropdown-item" href="#">Something else here</a> -->
                 </div>
+              </div>
+
+
             </div>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div id="sidebarContents" class="col-xs-12 col-md-12 skew-t" style="    width: 400px">
+                <!-- contents are inserted programatically by the current active tool -->
+              </div>
+              <div id="box1" class="col-xs-6 col-md-6"> </div>
+              <div id="box2" class="col-xs-6 col-md-6"> </div>
+              <!-- <div id="box3"  class="col-xs-4 col-md-4">  </div> -->
+
+              <div id="sidebarBottom" class="col-xs-12 col-md-12" style="    width: 400px">
+                <!-- contents are inserted programatically by the current active tool -->
+              </div>
+
+
+
+            </div>
+          </div>
         </div>
+      </div>
     </div>
     <div id="map">
 
     </div>
-</div>
-<div id="loading">
+  </div>
+  <div id="loading">
     <div class="loading-indicator">
-        <div class="progress progress-striped active">
-            <div class="progress-bar progress-bar-info progress-bar-full"></div>
-        </div>
+      <div class="progress progress-striped active">
+        <div class="progress-bar progress-bar-info progress-bar-full"></div>
+      </div>
     </div>
-</div>
-<!--
+  </div>
+  <!--
 <div id="authenticationError">
     <div class="row">
         <div class="col-md-4 offset-md-4">
@@ -183,47 +202,47 @@
 </div> -->
 
 
-<div class="modal fade" id="aboutModal" tabindex="-1" role="dialog">
+  <div class="modal fade" id="aboutModal" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                 <h5 id="aboutTitle" class="modal-title">About this map</h5>
-                <button class="close" type="button" data-dismiss="modal" aria-hidden="true">&times;</button>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 id="aboutTitle" class="modal-title">About this map</h5>
+          <button class="close" type="button" data-dismiss="modal" aria-hidden="true">&times;</button>
 
-            </div>
-            <div id="aboutContents" class="modal-body">
-                <p>{information about this map}</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Close</button>
-            </div>
-        </div><!-- /.modal-content -->
+        </div>
+        <div id="aboutContents" class="modal-body">
+          <p>{information about this map}</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
+  </div><!-- /.modal -->
 
-<div class="modal fade" id="shareModal" tabindex="-1" role="dialog">
+  <div class="modal fade" id="shareModal" tabindex="-1" role="dialog">
     <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Share URL</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Share URL</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-12">
+              <span id="shareURL"></span>
             </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-md-12">
-                        <span id="shareURL"></span>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Close</button>
-            </div>
-        </div><!-- /.modal-content -->
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
+  </div><!-- /.modal -->
 
-<!-- handlebars templates -->
-<!-- <script id="query-template" type="text/x-handlebars-template">
+  <!-- handlebars templates -->
+  <!-- <script id="query-template" type="text/x-handlebars-template">
     <div id="frmQueryWidget" class="well well-sm">
         <div class="form-group">
             <label for="queryWidgetLayer">Layer</label>
@@ -295,72 +314,65 @@
     </div>
 </script> -->
 
-<!-- required libraries -->
-<!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>-->
-<!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>-->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
-        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
-        crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.0/js/bootstrap.min.js"
-        integrity="sha384-3qaqj0lc6sV/qpzrc1N5DC6i1VRn/HyX4qdPaiEFbn54VjQBEU341pvjz7Dv3n6P"
-        crossorigin="anonymous"></script>
-<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
-  integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
-  crossorigin=""></script>
-<script src="https://unpkg.com/esri-leaflet@2.5.0/dist/esri-leaflet.js"
-    integrity="sha512-ucw7Grpc+iEQZa711gcjgMBnmd9qju1CICsRaryvX7HJklK0pGl/prxKvtHwpgm5ZHdvAil7YPxI1oWPOWK3UQ=="
-    crossorigin=""></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.2/leaflet.draw.js"></script>
-<!-- <script src="https://unpkg.com/esri-leaflet-renderers@2.1.2/dist/esri-leaflet-renderers.js"
+  <!-- required libraries -->
+     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>-->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.0/js/bootstrap.min.js" integrity="sha384-3qaqj0lc6sV/qpzrc1N5DC6i1VRn/HyX4qdPaiEFbn54VjQBEU341pvjz7Dv3n6P" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
+  <script src="https://unpkg.com/esri-leaflet@2.5.0/dist/esri-leaflet.js" integrity="sha512-ucw7Grpc+iEQZa711gcjgMBnmd9qju1CICsRaryvX7HJklK0pGl/prxKvtHwpgm5ZHdvAil7YPxI1oWPOWK3UQ==" crossorigin=""></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.2/leaflet.draw.js"></script>
+  <!-- <script src="https://unpkg.com/esri-leaflet-renderers@2.1.2/dist/esri-leaflet-renderers.js"
     integrity="sha512-/McnqdlwYvfeOEWqoniEagFRQnLi/TNbkHe4EJypmZI02LBT7vBU/+PZ5W3FSsFFlRbnMCsJvnbp5MX8XOBrnQ=="
     crossorigin=""></script> -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.min.js"></script>
 
-<!-- Plugins. Comment out any unused libaries to improve the page load times -->
-<script src="./src/plugins/bing/leaflet-bing-layer.min.js"></script>
-<script src="./src/plugins/geocoders/Control.Geocoder.js"></script>
-<script src="./src/plugins/geocoders/Control.Geocoder.harmony.js"></script>
-<!-- <script src="./src/plugins/leaflet-history/leaflet-history.js"></script> -->
-<script src="./src/plugins/leaflet-groupedlayercontrol/leaflet.groupedlayercontrol.js"></script>
-<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.1.0/leaflet.markercluster.js"></script> -->
-<!-- <script src="https://unpkg.com/esri-leaflet-cluster@2.1.0/dist/esri-leaflet-cluster.js"
+  <!-- Plugins. Comment out any unused libaries to improve the page load times -->
+  <script src="./src/plugins/bing/leaflet-bing-layer.min.js"></script>
+  <script src="./src/plugins/geocoders/Control.Geocoder.js"></script>
+  <script src="./src/plugins/geocoders/Control.Geocoder.harmony.js"></script>
+  <!-- <script src="./src/plugins/leaflet-history/leaflet-history.js"></script> -->
+  <script src="./src/plugins/leaflet-groupedlayercontrol/leaflet.groupedlayercontrol.js"></script>
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.1.0/leaflet.markercluster.js"></script> -->
+  <!-- <script src="https://unpkg.com/esri-leaflet-cluster@2.1.0/dist/esri-leaflet-cluster.js"
     integrity="sha512-fEdNFHisleVtEYdLhW4Z2RsR7TN6hLutE/+O4D+skfTNY2rlHm8HOZARPWkdrFFy/+i2KjFxcZAKTUWaVfbV0g=="
     crossorigin=""></script> -->
-<script src="./src/plugins/bookmarks/Leaflet.Bookmarks.js"></script>
-<!-- <script src="./src/plugins/WFST/Leaflet-WFST.min.js"></script>
+  <script src="./src/plugins/bookmarks/Leaflet.Bookmarks.js"></script>
+  <!-- <script src="./src/plugins/WFST/Leaflet-WFST.min.js"></script>
 <script src="./src/plugins/datatables/datatables.min.js"></script>
 <script src="./src/plugins/datatables/buttons.html5.min.js"></script>
 <script src="./src/plugins/datatables/dataTables.buttons.min.js"></script>
 <script src="./src/plugins/datatables/buttons.bootstrap.min.js"></script>
 <script src="./src/plugins/moment/moment.js"></script> -->
-<script src="./src/plugins/proj4js/proj4.js"></script>
-<script src="./src/plugins/proj4js/proj4leaflet.js"></script>
-<script src="./src/plugins/growl/javascripts/jquery.growl.js"></script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/2.1.0/chroma.min.js" crossorigin="anonymous"></script>
+  <script src="./src/plugins/proj4js/proj4.js"></script>
+  <script src="./src/plugins/proj4js/proj4leaflet.js"></script>
+  <script src="./src/plugins/growl/javascripts/jquery.growl.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/2.1.0/chroma.min.js" crossorigin="anonymous"></script>
 
-<script src="https://unpkg.com/leaflet.vectorgrid@latest/dist/Leaflet.VectorGrid.bundled.js"></script>
+  <script src="https://unpkg.com/leaflet.vectorgrid@latest/dist/Leaflet.VectorGrid.bundled.js"></script>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/11.0.2/bootstrap-slider.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/11.0.2/css/bootstrap-slider.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/11.0.2/bootstrap-slider.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/11.0.2/css/bootstrap-slider.css" />
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.7.1/jquery.contextMenu.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.7.1/jquery.contextMenu.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.7.1/jquery.ui.position.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.7.1/jquery.contextMenu.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.7.1/jquery.contextMenu.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.7.1/jquery.ui.position.js"></script>
 
-</div> -->
+  </div> -->
 
 
-<!-- this app's code -->
+  <!-- this app's code -->
 
-<script src="./src/js/app.js"></script>
-<script src="./src/js/listeners.js"></script>
+  <script src="./src/js/app.js"></script>
+  <script src="./src/js/listeners.js"></script>
 
-<!-- optional - custom functionality -->
-<script src="custom.js"></script>
+  <!-- optional - custom functionality -->
+  <script src="custom.js"></script>
 
-<!-- the configuration file holding this app's customisations -->
-<script  src="config.js"></script>
+  <!-- the configuration file holding this app's customisations -->
+  <script src="config.js"></script>
 
 </body>
+
 </html>

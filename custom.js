@@ -133,42 +133,67 @@ function timeString(unxiTimestamp) {
     return ts.substring(0, 10) + ' ' + ts.substring(11, 16) + 'Z';
 }
 
+function populateSidebar(feature) {
+
+    $('.ascent-choice').off('click');
+
+    var first = feature.properties.ascents[0];
+    var appendix = "";
+    if (first.id_type == "mobile") {
+        appendix = " (mobile)";
+    }
+    $('#sidebarTitle').html(feature.properties.name + appendix);
+
+    // clickable link
+    var a = document.createElement('a');
+    var link = document.createTextNode("station " + first.station_id);
+    a.appendChild(link);
+    a.title = "station " + first.station_id;
+    // history dropdown
+    var history = document.getElementById('history');
+    history.innerHTML = '';
+
+    var hasBUFR = false;
+    $.each(feature.properties.ascents, function(index, ascent) {
+        if (ascent.source == "BUFR") {
+            hasBUFR = true;
+            return false;
+        }
+    });
+    $.each(feature.properties.ascents, function(index, ascent) {
+        if (hasBUFR && (ascent.source === "netCDF")) {
+            return true; // continue
+        }
+        var a = document.createElement('a');
+        a.classList.add('dropdown-item');
+        a.classList.add('ascent-choice');
+        var text = document.createTextNode(timeString(ascent.syn_timestamp));
+        a.appendChild(text);
+        history.appendChild(a);
+    });
+    $('.ascent-choice').on('click', function() {
+        console.log('click', $(this).text(), $(this).index());
+        plotStation(feature, $(this).index());
+    })
+}
+
 function plotStation(feature, index) {
 
     var ascent = feature.properties.ascents[index];
-    var text = feature.properties.name;
-    $('#sidebarTitle').html(text);
-
-    // Create anchor element.
-    var a = document.createElement('a');
-    // Create the text node for anchor element.
+    // Set the link for this ascent
     var link = document.createTextNode("station " + ascent.station_id);
-    // Append the text node to anchor element.
-    a.appendChild(link);
-    // Set the title.
-    a.title = "station " + ascent.station_id;
+    var a = document.createElement('a');
 
-    // Set the href property.
-    a.href = "https://radiosonde.mah.priv.at/dev/?station=" + ascent.station_id;
+    a.href = "https://radiosonde.mah.priv.at/dev/?station=" + ascent.station_id +
+        "&timestamp=" + ascent.syn_timestamp;
+    a.appendChild(link);
     $('#sidebarSubTitle').html(a);
 
-    var syntime = ascent.syn_timestamp;
-    $('#box1').html(timeString(syntime));
-    //    $('#box2').html("id: " + ascent.station_id);
-    if (ascent.source === "BUFR") {
-
-        $('#box2').html("source: DWD");
-    }
-    else {
-        $('#box2').html("source: MADIS");
-    }
-    //    $('#sidebarBottom').html(timeString(syntime));
-
+    $('#sidebarSubTitleRight').html(timeString(ascent.syn_timestamp));
     if (!ascent.hasOwnProperty('data')) {
         var p = datapath + ascent.path;
         loadAscent(p, ascent, plotSkewT);
-    }
-    else {
+    } else {
         plotSkewT(ascent.data);
     }
 }
@@ -199,17 +224,11 @@ function markerClicked(l) {
         fillColor: markerSelectedColor
     });
     selectedMarker = marker;
+    populateSidebar(marker.feature);
     plotStation(marker.feature, 0);
     // this pan should happen only after the sidebar is visible
     bootleaf.map.panTo(marker.getLatLng());
-}
-
-function findBUFR(value, index, array) {
-    return (value.source === "BUFR");
-}
-
-function findnetCDF(value, index, array) {
-    return (value.source === "netCDF");
+    console.log(marker.getLatLng());
 }
 
 function _isTouchDevice() {
@@ -256,7 +275,12 @@ function gotSummary(data) {
             markerList.push(marker);
             markerGroups.push(layergroup);
 
-            var content = "<b>" + feature.properties.name + "</b>" + "<br>  " + rounded_age + " hours old";
+            var appendix = "";
+            if (ascent.id_type == "mobile") {
+                appendix = " (mobile)";
+            }
+
+            var content = "<b>" + feature.properties.name + "</b>" + appendix + "<br>  " + rounded_age + " hours old";
             if (isTouchDevice) {
                 marker.on('click', markerClicked);
             }
@@ -378,7 +402,7 @@ function afterMapLoads() {
 function updateMarkers(agelimit) {
     markerGroups.forEach(function(group, index) {
         var marker;
-        for(var layer of group.getLayers()) {
+        for (var layer of group.getLayers()) {
             if (layer instanceof L.CircleMarker) {
                 marker = layer;
                 break;
@@ -523,10 +547,14 @@ function createContextMenus() {
             }
         });
 
-        // $('.context-menu-map').on('click', function(e) {
-        $('.leaflet-container').on('click', function(e) {
-            console.log('YY map clicked', this);
+        bootleaf.map.on('click', function(e) {
+            console.log("Lat, Lon : " + e.latlng.lat + ", " + e.latlng.lng)
         });
+
+        // $('.context-menu-map').on('click', function(e) {
+        // $('.leaflet-container').on('click', function(e) {
+        //     console.log('YY map clicked', this);
+        // });
     });
 
     // //Right click on the map activated
