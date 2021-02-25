@@ -380,3 +380,8 @@ div.dt-buttons {
 #authenticationError {
   display: none;
 }
+
+
+.social a {
+  padding: 0 .5em;
+}
