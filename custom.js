@@ -57,6 +57,56 @@ function round3(value) {
     return Math.round(value * 1000) / 1000
 }
 
+// https://stackoverflow.com/questions/19721439/download-json-object-as-a-file-from-browser
+function downloadObjectAsJson(exportObj, exportName){
+   var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj));
+   var downloadAnchorNode = document.createElement('a');
+   downloadAnchorNode.setAttribute("href",     dataStr);
+   downloadAnchorNode.setAttribute("download", exportName + ".json");
+   document.body.appendChild(downloadAnchorNode); // required for firefox
+   downloadAnchorNode.click();
+   downloadAnchorNode.remove();
+ }
+
+
+function addHeaders(table, keys) {
+    var row = table.insertRow();
+    for (var i = 0; i < keys.length; i++) {
+        var cell = row.insertCell();
+        cell.appendChild(document.createTextNode(keys[i]));
+    }
+}
+
+function genDetail(prop, container) {
+
+    var table = document.createElement('table');
+    table.classList.add('table');
+    table.classList.add('table-sm-');
+
+    // for (var i = 0; i < children.length; i++) {
+    //
+    //     var child = children[i];
+    //     if (i === 0) {
+    //         addHeaders(table, Object.keys(child));
+    //     }
+
+    var detail = document.getElementById(container);
+
+    detail.innerHTML = '';
+    Object.keys(prop).forEach(function(k) {
+        console.log(k);
+        var row = table.insertRow();
+
+        var cell = row.insertCell();
+        cell.appendChild(document.createTextNode(k));
+        cell = row.insertCell();
+        cell.appendChild(document.createTextNode(prop[k]));
+    })
+    // }
+    detail.appendChild(table);
+}
+
+
 function plotSkewT(geojson) {
     var data = [];
     var pscale = 1.;
@@ -82,9 +132,17 @@ function plotSkewT(geojson) {
         data.push(sample);
     }
     skewt.plot(data);
+
+    //var detailPane = $('#detailPane');
+    genDetail(geojson.properties, 'detailPane');
+
     $('#skew-t').collapse('show')
+    $('#detailPane').collapse('hide');
     $("#sidebar").show("slow");
 }
+
+
+
 
 function drawpath(feature) {
     var path_source = feature.properties.path_source;
@@ -190,7 +248,7 @@ function plotStation(feature, index) {
     a.appendChild(link);
     $('#sidebarSubTitle').html(a);
 
-    $('#sidebarSubTitleRight').html(timeString(ascent.syn_timestamp));
+    $('#ascentChoice').html(timeString(ascent.syn_timestamp));
     if (!ascent.hasOwnProperty('data')) {
         var p = datapath + ascent.path;
         loadAscent(p, ascent, plotSkewT);
@@ -567,8 +625,9 @@ function createContextMenus() {
 
 $('#detail').on('click', function(e) {
 
+
     $('#detailPane').collapse('toggle');
-   $('#skew-t').collapse('toggle');
+    $('#skew-t').collapse('toggle');
 });
 
 
@@ -585,6 +644,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
     //facebook
     $('#share-wa').attr('data-url', url).attr('data-title', title).attr('data-sharer', 'whatsapp');
+    $('#share-telegram').attr('data-url', url).attr('data-title', title).attr('data-sharer', 'telegram');
     // //facebook
     // $('#share-fb').attr('data-url', url).attr('data-sharer', 'facebook');
     // //twitter
