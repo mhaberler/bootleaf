@@ -395,3 +395,30 @@ div.dt-buttons {
   background-color: #ffeeba;
   /* color: #fff; */
 }
+
+.mahinfo {
+    padding: 6px 8px;
+    font: 14px/16px Arial, Helvetica, sans-serif;
+    /* background: white;
+    background: rgba(255,255,255,0.8); */
+    background: linear-gradient(90deg, #440154, #482475, #414487, #355f8d, #2a788e, #21908d, #22a884, #42be71, #7ad151, #bddf26, #bddf26);
+
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    border-radius: 5px;
+}
+.mahinfo h4 {
+    margin: 0 0 5px;
+    color: #777;
+}
+
+.mahlegend {
+    line-height: 18px;
+    color: #555;
+}
+.mahlegend i {
+    width: 18px;
+    height: 18px;
+    float: left;
+    margin-right: 8px;
+    opacity: 0.7;
+}

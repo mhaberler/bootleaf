@@ -3,7 +3,7 @@ var datadir = 'data-dev/';
 var datapath = toplevel + datadir;
 var summary_url = datapath + 'summary.geojson';
 var sondeinfo_url = toplevel + 'static/' + 'sondeinfo.json';
-var isTouchDevice = _isTouchDevice();
+var isTouchDevice = isMobile();
 var summary = null;
 var markers = null;
 var saveMemory = isTouchDevice;
@@ -26,13 +26,9 @@ var MarkerOptions = {
     fillOpacity: 0.8,
     className: "context-menu-marker"
 };
-
 var markerSelectedColor = "OrangeRed";
-
 var viridisStops = ['#440154', '#482777', '#3F4A8A', '#31678E', '#26838F', '#1F9D8A', '#6CCE5A', '#B6DE2B', '#FEE825'];
 var chroma_scale = chroma.scale(viridisStops);
-
-
 var path_colors = {
     "simulated": {
         color: 'DarkOrange'
@@ -104,83 +100,6 @@ function genDownload(ascent) {
     }(ascent)));
 }
 
-
-function genDetailTable(prop, container) {
-
-    var table = document.createElement('table');
-    table.classList.add('table');
-    table.classList.add('table-sm');
-
-    // for (var i = 0; i < children.length; i++) {
-    //
-    //     var child = children[i];
-    //     if (i === 0) {
-    //         addHeaders(table, Object.keys(child));
-    //     }
-
-    var detail = document.getElementById(container);
-
-    detail.innerHTML = '';
-    Object.keys(prop).forEach(function(k) {
-        // console.log(k);
-        var row = table.insertRow();
-
-        var cell = row.insertCell();
-        cell.appendChild(document.createTextNode(k));
-        cell = row.insertCell();
-        cell.appendChild(document.createTextNode(prop[k]));
-    })
-    // }
-    detail.appendChild(table);
-}
-
-// netcdf
-// "properties": {
-//   "station_id": "10739",
-//   "id_type": "wmo",
-//   "source": "netCDF",
-//   "sonde_type": 124,
-//   "path_source": "simulated",
-//   "syn_timestamp": 1614340800,
-//   "firstSeen": 1614336300,
-//   "lat": 48.83000183105469,
-//   "lon": 9.2,
-//   "elevation": 315,
-//   "lastSeen": 1614338736.603175,
-//   "origin_member": "20210226_1200.gz",
-//   "fmt": 2,
-//   "station_name": "Stuttgart/Schnarrenberg"
-// }
-
-// BUFR
-// "properties": {
-//   "station_id": "06610",
-//   "id_type": "wmo",
-//   "source": "BUFR",
-//   "path_source": "origin",
-//   "syn_timestamp": 1614340800,
-//   "firstSeen": 1614333599,
-//   "lat": 46.813050000000004,
-//   "lon": 6.9436100000000005,
-//   "sonde_type": 141,
-//   "sonde_serial": "R3660416",
-//   "sonde_frequency": 403500000,
-//   "sonde_humcorr": 3,
-//   "sonde_psensor": 1,
-//   "sonde_tsensor": 4,
-//   "sonde_hsensor": 8,
-//   "sonde_gepot": 1,
-//   "sonde_track": 8,
-//   "sonde_measure": 7,
-//   "sonde_swversion": "MW41 2.17.0",
-//   "text": "Increasing pressure",
-//   "elevation": 491,
-//   "lastSeen": 1614339569,
-//   "origin_member": "A_IUSD01LSSW261200_C_EDZW_20210226124900_98053172.bin",
-//   "origin_archive": "temp-fm94_20210226-125000495801_51721.zip",
-//   "fmt": 2,
-//   "station_name": "Payerne"
-// }
 function bold(s) {
     return "<b>" + s + "</b>";
 }
@@ -189,6 +108,7 @@ function minutes(sec) {
     var m = sec/60;
     return round(m);
 }
+
 function genDetail(fc, container) {
 
     var p = fc.properties;
@@ -304,22 +224,6 @@ function drawpath(feature) {
     L.polyline(lineCoordinate, path_colors[path_source]).addTo(bootleaf.map);
 }
 
-// function mouseover(l) {
-//     var ascents = l.target.feature.properties.ascents;
-//
-//     for (var i in ascents) {
-//         var a = ascents[i];
-//         if (i >= drawAscents) {
-//             break;
-//         }
-//         if (!a.hasOwnProperty('data')) {
-//             var p = datapath + a.path;
-//             l.index = i;
-//             loadAscent(l, p, i, drawpath);
-//         }
-//     }
-// }
-
 var skewt = new SkewT('#skew-t');
 
 function loadAscent(url, ascent, completion) {
@@ -363,13 +267,6 @@ function populateSidebar(feature) {
     var ascentHistory = document.getElementById('ascentHistory');
     ascentHistory.innerHTML = '';
 
-    // var hasBUFR = false;
-    // $.each(feature.properties.ascents, function(index, ascent) {
-    //     if (ascent.source == "BUFR") {
-    //         hasBUFR = true;
-    //         return false;
-    //     }
-    // });
     $.each(feature.properties.ascents, function(index, ascent) {
         var a = document.createElement('a');
         a.classList.add('dropdown-item');
@@ -397,10 +294,6 @@ function plotStation(feature, index) {
     var link = document.createTextNode("station " + ascent.station_id);
     var a = document.createElement('a');
 
-    // a.href = "https://radiosonde.mah.priv.at/dev/?station=" + ascent.station_id +
-    //     "&timestamp=" + ascent.syn_timestamp;
-    // a.appendChild(link);
-    // $('#sidebarSubTitle').html(a);
     var ts = timeString(ascent.syn_timestamp);
     console.log('set #ascentChoice', ts);
     $('#ascentChoice').html(ts);
@@ -446,10 +339,13 @@ function markerClicked(l) {
     console.log(marker.getLatLng());
 }
 
-function _isTouchDevice() {
-    return (('ontouchstart' in window) ||
-        (navigator.maxTouchPoints > 0) ||
-        (navigator.msMaxTouchPoints > 0));
+function isMobile() {
+    // device detection
+    if (/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|ipad|iris|kindle|Android|Silk|lge |maemo|midp|mmp|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i.test(navigator.userAgent) ||
+        /1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(navigator.userAgent.substr(0, 4))) {
+        return true;
+    }
+    return false;
 }
 
 function now() {
@@ -581,17 +477,6 @@ function closeBookmark(e) {
     $(".leaflet-popup-close-button")[0].click();
 }
 
-
-// not used right now
-// might come in use with track layers
-var pbfLayer;
-var clearHighlight = function() {
-    if (highlight) {
-        pbfLayer.resetFeatureStyle(highlight);
-    }
-    highlight = null;
-};
-
 /**
  * Given a valid GeoJSON object, return a CSV composed of all decodable points.
  * @param {Object} geojson any GeoJSON object
@@ -625,38 +510,10 @@ function afterMapLoads() {
 
     console.log("After map loads function");
 
-    pbfLayer = bootleaf.layers[0];
-    if (pbfLayer) {
-        pbfLayer.on('click', function(e) { // The .on method attaches an event handler
-                L.popup()
-                    .setContent(e.layer.properties.name || e.layer.properties.type ||
-                        e.layer.properties.kind)
-                    // 					.setContent(JSON.stringify(e.layer))
-                    .setLatLng(e.latlng)
-                    .openOn(bootleaf.map)
-                    .on('remove', clearHighlight);
-
-                highlight = e.layer.properties.id;
-                if (highlight) {
-                    pbfLayer.setFeatureStyle(highlight, {
-                        weight: 2,
-                        color: 'red',
-                        opacity: 1,
-                        fillColor: 'red',
-                        fill: true,
-                        radius: 6,
-                        fillOpacity: 1
-                    });
-                    L.DomEvent.stop(e);
-                }
-            })
-            .addTo(bootleaf.map);
-    }
     bootleaf.map.on('bookmark:show', function(e) {
         fadeoutManager(closeBookmark, bookmarkLife, e);
     });
     createAgeSlider(markers);
-    createContextMenus();
 }
 
 function updateMarkers(agelimit) {
@@ -723,147 +580,3 @@ function createAgeSlider(markers) {
     });
     bootleaf.map.addControl(new SequenceControl());
 };
-
-function createContextMenus() {
-
-    $(function() {
-        $.contextMenu({
-            selector: '.context-menu-marker',
-            callback: function(key, options) {
-                var m = "XX marker clicked: " + key;
-                console.log(m);
-            },
-            items: {
-                "history": {
-                    name: "History",
-                    icon: "edit"
-                },
-                "details": {
-                    name: "Details",
-                    icon: "cut"
-                },
-                // copy: {
-                //     name: "Copy",
-                //     icon: "copy"
-                // },
-                // "paste": {
-                //     name: "Paste",
-                //     icon: "paste"
-                // },
-                // "delete": {
-                //     name: "Delete",
-                //     icon: "delete"
-                // },
-                // "sep1": "---------",
-                "quit": {
-                    name: "Quit",
-                    icon: function() {
-                        return 'context-menu-icon context-menu-icon-quit';
-                    }
-                }
-            }
-        });
-
-        // $('.context-menu-marker').on('click', function(e) {
-        //     console.log('YY marker clicked', this);
-        // })
-    });
-
-    $(function() {
-        $.contextMenu({
-            selector: '.leaflet-container .context-menu-map', // '.context-menu-map',
-            callback: function(key, options) {
-                var m = "XX map clicked: " + key;
-                console.log(m)
-            },
-            items: {
-                "edit": {
-                    name: "Map Edit",
-                    icon: "edit"
-                },
-                "cut": {
-                    name: "Cut",
-                    icon: "cut"
-                },
-                copy: {
-                    name: "Copy",
-                    icon: "copy"
-                },
-                "paste": {
-                    name: "Paste",
-                    icon: "paste"
-                },
-                "delete": {
-                    name: "Delete",
-                    icon: "delete"
-                },
-                "sep1": "---------",
-                "quit": {
-                    name: "Quit",
-                    icon: function() {
-                        return 'context-menu-icon context-menu-icon-quit';
-                    }
-                }
-            }
-        });
-
-        bootleaf.map.on('click', function(e) {
-            console.log("Lat, Lon : " + e.latlng.lat + ", " + e.latlng.lng)
-        });
-
-        // $('.context-menu-map').on('click', function(e) {
-        // $('.leaflet-container').on('click', function(e) {
-        //     console.log('YY map clicked', this);
-        // });
-    });
-
-    // //Right click on the map activated
-    // bootleaf.map.on('contextmenu', function(e) {
-    //     ctxmenu(e); // alert(e.latlng);
-    // });
-}
-
-
-document.addEventListener("DOMContentLoaded", function(event) {
-
-    // Uses sharer.js
-    //  https://ellisonleao.github.io/sharer.js/#twitter
-    var url = window.location.href;
-    var title = document.title;
-    var subject = "Read this good article";
-    var via = "yourTwitterUsername";
-    //console.log( url );
-    //console.log( title );
-
-    //facebook
-    $('#share-wa').attr('data-url', url).attr('data-title', title).attr('data-sharer', 'whatsapp');
-    $('#share-telegram').attr('data-url', url).attr('data-title', title).attr('data-sharer', 'telegram');
-    // //facebook
-    // $('#share-fb').attr('data-url', url).attr('data-sharer', 'facebook');
-    // //twitter
-    // $('#share-tw').attr('data-url', url).attr('data-title', title).attr('data-via', via).attr('data-sharer', 'twitter');
-    // //linkedin
-    // $('#share-li').attr('data-url', url).attr('data-sharer', 'linkedin');
-    // // google plus
-    // $('#share-gp').attr('data-url', url).attr('data-title', title).attr('data-sharer', 'googleplus');
-    // email
-    $('#share-em').attr('data-url', url).attr('data-title', title).attr('data-subject', subject).attr('data-sharer', 'email');
-
-    //Prevent basic click behavior
-    $(".sharer button").click(function() {
-        event.preventDefault();
-    });
-
-
-    // only show whatsapp on mobile devices
-    var isMobile = false; //initiate as false
-    // device detection
-    if (/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|ipad|iris|kindle|Android|Silk|lge |maemo|midp|mmp|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i.test(navigator.userAgent) ||
-        /1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(navigator.userAgent.substr(0, 4))) {
-        isMobile = true;
-    }
-
-    if (isMobile == true) {
-        $("#share-wa").hide();
-    }
-});
