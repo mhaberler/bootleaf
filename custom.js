@@ -453,6 +453,7 @@ function addMeta() {
 
 function beforeMapLoads() {
     console.log("Before map loads function");
+    $("#loading").show();
 
     agelimit = localStorage.getItem('agelimit');
 
@@ -514,6 +515,7 @@ function afterMapLoads() {
         fadeoutManager(closeBookmark, bookmarkLife, e);
     });
     createAgeSlider(markers);
+    $("#loading").hide();
 }
 
 function updateMarkers(agelimit) {

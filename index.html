@@ -28,15 +28,8 @@
 
 
   <!-- optional libraries - comment out any libraries which are not being used to improve page load times -->
-  <!-- <script src="./src/plugins/bing/leaflet-bing-layer.js"></script> -->
-
-
-  <!-- <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.1.0/MarkerCluster.Default.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.1.0/MarkerCluster.css"> -->
   <link rel="stylesheet" href="./src/plugins/geocoders/Control.Geocoder.css" />
   <link rel="stylesheet" href="./src/plugins/bookmarks/leaflet.bookmarks.css" />
-  <!-- <link rel="stylesheet" href="./src/plugins/leaflet-history/leaflet-history.css"/> -->
 
   <!-- Customise the styles used in this map -->
   <link rel="stylesheet" href="style.css">
@@ -84,13 +77,13 @@
               <i class="fa fa-arrows-alt"></i>&nbsp;&nbsp;Zoom To Full Extent
             </a>
 
-            <a href="#" id="history-btn" class="dropdown-item mapTools" data-tool="history">
+            <!-- <a href="#" id="history-btn" class="dropdown-item mapTools" data-tool="history">
               <i class="fa fa-info-circle"></i>&nbsp;&nbsp;Station history
             </a>
 
             <a href="#" id="share-btn" class="dropdown-item mapTools" data-tool="share">
               <i class="fa fa-share"></i>&nbsp;&nbsp;Share map
-            </a>
+            </a> -->
           </div>
         </li>
         <li class="nav-item dropdown">
@@ -112,39 +105,15 @@
 
           <div class="card-header">
             <div class="row">
-              <h5 class="card-title col-xs-8 col-md-8"><span id="sidebarTitle">Sidebar</span>
-              </h5>
-
-              <div class="col-xs-1 col-md-1">
-                <button type="button" class="sharer btn btn-xs btn-default  pull-right" id="share-wa">
-                  <i class="fa fa-1x fa-whatsapp"></i>
-                </button>
-              </div>
-
-              <div class="col-xs-1 col-md-1">
-                <button type="button" class="sharer btn btn-xs btn-default  pull-right" id="share-telegram">
-                  <i class="fa fa-1x fa-telegram"></i>
-                </button>
-              </div>
-
-              <div class="col-xs-1 col-md-1">
-                <button type="button" class="sharer btn btn-xs btn-default  pull-right" id="share-em">
-                  <i class="fa fa-1x fa-envelope-square"></i>
-                </button>
-              </div>
-
-              <div class="col-xs-1 col-md-1">
+              <h5 class="card-title col-xs-12 col-md-12"><span id="sidebarTitle">Sidebar</span>
                 <button type="button" class="btn btn-xs btn-default  pull-right" id="sidebar-hide-btn">
                   <i class="fa fa-chevron-left"></i>
                 </button>
-              </div>
-
+              </h5>
             </div>
           </div>
 
           <div class="card-body">
-
-
             <div class="row">
               <div id="skew-t" class="collapse col-xs-12 col-md-12 skew-t" style="    width: 400px">
               </div>
@@ -156,7 +125,6 @@
             </div>
 
             <div class="flex-row btn-group dropup  card-body">
-
               <div style="flex-grow:1">
                 <button class="btn-info" type="button" id="ascentChoice" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   List of ascents
@@ -167,7 +135,7 @@
               </div>
 
               <div style="flex-grow:1" id="detail">
-                <button  class="btn-info" type="button">
+                <button class="btn-info" type="button">
                   Detail
                 </button>
               </div>
@@ -183,7 +151,6 @@
                   </div>
                 </div>
               </div>
-
             </div>
           </div>
         </div>
