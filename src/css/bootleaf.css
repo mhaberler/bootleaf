@@ -385,3 +385,13 @@ div.dt-buttons {
 .social a {
   padding: 0 .5em;
 }
+
+.dropdown-bufr-item{
+  background-color: #bee5eb;
+  /* color: #fff; */
+}
+
+.dropdown-netcdf-item{
+  background-color: #ffeeba;
+  /* color: #fff; */
+}
