@@ -342,6 +342,7 @@ var SkewT = function(div) {
 
 
     var plot = function(s){
+
         skewtgroup.selectAll("path").remove(); //clear previous paths from skew
         barbgroup.selectAll("use").remove(); //clear previous paths from barbs
 
