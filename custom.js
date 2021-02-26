@@ -189,8 +189,9 @@ function minutes(sec) {
     var m = sec/60;
     return round(m);
 }
-function genDetail(p, container) {
+function genDetail(fc, container) {
 
+    var p = fc.properties;
     var para = "<p>";
     var brk = "<br>";
     var detail = document.getElementById(container);
@@ -205,6 +206,8 @@ function genDetail(p, container) {
     html += bold("elevation:   ") + p.elevation + "m" + brk;
     if (p.text)
         html += bold("text:   ") + p.text + brk;
+
+    html += bold("samples:   ") + fc.features.length + brk;
 
     html += bold("track source:   ");
     if (p.path_source == "origin")
@@ -281,10 +284,7 @@ function plotSkewT(geojson) {
         data.push(sample);
     }
     skewt.plot(data);
-
-    //var detailPane = $('#detailPane');
-    genDetail(geojson.properties, 'detailPane');
-
+    genDetail(geojson, 'detailPane');
     genDownload(geojson);
 
     $('#skew-t').collapse('show')
