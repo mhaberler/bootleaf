@@ -1,10 +1,14 @@
-var datapath = 'https://radiosonde.mah.priv.at/data-dev/';
+var toplevel = 'https://radiosonde.mah.priv.at/';
+var datadir = 'data-dev/';
+var datapath = toplevel + datadir;
 var summary_url = datapath + 'summary.geojson';
+var sondeinfo_url = toplevel + 'static/' + 'sondeinfo.json';
 var isTouchDevice = _isTouchDevice();
 var summary = null;
 var markers = null;
 var saveMemory = isTouchDevice;
 var stations = {}; // features indexed by station_id
+var sondeinfo = {};
 var markerList = [];
 var markerGroups = [];
 let zeroK = 273.15;
@@ -58,16 +62,24 @@ function round3(value) {
 }
 
 // https://stackoverflow.com/questions/19721439/download-json-object-as-a-file-from-browser
-function downloadObjectAsJson(exportObj, exportName){
-   var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj));
-   var downloadAnchorNode = document.createElement('a');
-   downloadAnchorNode.setAttribute("href",     dataStr);
-   downloadAnchorNode.setAttribute("download", exportName + ".json");
-   document.body.appendChild(downloadAnchorNode); // required for firefox
-   downloadAnchorNode.click();
-   downloadAnchorNode.remove();
- }
+function downloadObjectAs(type, exportObj, exportName) {
+    if (type == 'CSV') {
+        var dataStr = "data:text/csv;charset=utf-8," + geojson2dsv(exportObj);
+        var fn = exportName + ".csv";
+    }
+    else if (type == 'GeoJSON') {
+        var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj));
+        var fn = exportName + ".json";
+    }
+    else return;
 
+    var downloadAnchorNode = document.createElement('a');
+    downloadAnchorNode.setAttribute("href", dataStr);
+    downloadAnchorNode.setAttribute("download", fn);
+    document.body.appendChild(downloadAnchorNode); // required for firefox
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
+}
 
 function addHeaders(table, keys) {
     var row = table.insertRow();
@@ -77,11 +89,27 @@ function addHeaders(table, keys) {
     }
 }
 
-function genDetail(prop, container) {
+$('#detail').on('click', function(e) {
+    $('#detailPane').collapse('toggle');
+    $('#skew-t').collapse('toggle');
+});
+
+function genDownload(ascent) {
+    $('.dowload-choice').off();
+    $('.dowload-choice').on('click', (function(e) {
+        return function(e) {
+            var fn = genFilename(ascent);
+            downloadObjectAs($(this).text(), ascent, fn)
+        };
+    }(ascent)));
+}
+
+
+function genDetailTable(prop, container) {
 
     var table = document.createElement('table');
     table.classList.add('table');
-    table.classList.add('table-sm-');
+    table.classList.add('table-sm');
 
     // for (var i = 0; i < children.length; i++) {
     //
@@ -94,7 +122,7 @@ function genDetail(prop, container) {
 
     detail.innerHTML = '';
     Object.keys(prop).forEach(function(k) {
-        console.log(k);
+        // console.log(k);
         var row = table.insertRow();
 
         var cell = row.insertCell();
@@ -104,6 +132,127 @@ function genDetail(prop, container) {
     })
     // }
     detail.appendChild(table);
+}
+
+// netcdf
+// "properties": {
+//   "station_id": "10739",
+//   "id_type": "wmo",
+//   "source": "netCDF",
+//   "sonde_type": 124,
+//   "path_source": "simulated",
+//   "syn_timestamp": 1614340800,
+//   "firstSeen": 1614336300,
+//   "lat": 48.83000183105469,
+//   "lon": 9.2,
+//   "elevation": 315,
+//   "lastSeen": 1614338736.603175,
+//   "origin_member": "20210226_1200.gz",
+//   "fmt": 2,
+//   "station_name": "Stuttgart/Schnarrenberg"
+// }
+
+// BUFR
+// "properties": {
+//   "station_id": "06610",
+//   "id_type": "wmo",
+//   "source": "BUFR",
+//   "path_source": "origin",
+//   "syn_timestamp": 1614340800,
+//   "firstSeen": 1614333599,
+//   "lat": 46.813050000000004,
+//   "lon": 6.9436100000000005,
+//   "sonde_type": 141,
+//   "sonde_serial": "R3660416",
+//   "sonde_frequency": 403500000,
+//   "sonde_humcorr": 3,
+//   "sonde_psensor": 1,
+//   "sonde_tsensor": 4,
+//   "sonde_hsensor": 8,
+//   "sonde_gepot": 1,
+//   "sonde_track": 8,
+//   "sonde_measure": 7,
+//   "sonde_swversion": "MW41 2.17.0",
+//   "text": "Increasing pressure",
+//   "elevation": 491,
+//   "lastSeen": 1614339569,
+//   "origin_member": "A_IUSD01LSSW261200_C_EDZW_20210226124900_98053172.bin",
+//   "origin_archive": "temp-fm94_20210226-125000495801_51721.zip",
+//   "fmt": 2,
+//   "station_name": "Payerne"
+// }
+function bold(s) {
+    return "<b>" + s + "</b>";
+}
+
+function minutes(sec) {
+    var m = sec/60;
+    return round(m);
+}
+function genDetail(p, container) {
+
+    var para = "<p>";
+    var brk = "<br>";
+    var detail = document.getElementById(container);
+    var html;
+    var s = "Station: " + p.station_name;
+    if (p.id_type == "mobile")
+        s += " (mobile)";
+    if (p.id_type == "wmo")
+            s += " (WMO id: " + p.station_id +")";
+
+    html = bold(s) + para + para;
+    html += bold("elevation:   ") + p.elevation + "m" + brk;
+    if (p.text)
+        html += bold("text:   ") + p.text + brk;
+
+    html += bold("track source:   ");
+    if (p.path_source == "origin")
+        html += "   GPS";
+    if (p.path_source == "simulated")
+        html += "   simulated";
+
+    html += brk;
+    html +=  bold("Synoptic time:   ") + timeString(p.syn_timestamp) + brk;
+    if (p.firstSeen)
+        html +=  bold("First seen:   ") + timeString(p.firstSeen) + brk;
+    if (p.lastSeen)
+        html +=  bold("Last seen:   ") + timeString(p.lastSeen) +
+            " (" + minutes(p.lastSeen - p.firstSeen) + " min later)" + brk;
+
+    html += para + bold("Sonde:") + brk;
+    if (p.sonde_type && sondeinfo.sonde_types[p.sonde_type])
+        html +=  bold("type:   ") + sondeinfo.sonde_types[p.sonde_type] + brk;
+    if (p.sonde_serial)
+        html +=  bold("serial number:   ") + p.sonde_serial + brk;
+    if (p.sonde_frequency)
+        html +=  bold("transmit frequency:   ") + round3(p.sonde_frequency/1000)/1000 + " MHz" + brk;
+    if (p.sonde_swversion)
+            html +=  bold("SW version:   ") + p.sonde_swversion + brk;
+    if (p.sonde_humcorr && sondeinfo.sonde_humcorr[p.sonde_humcorr])
+        html +=  bold("humidity correction:   ") + sondeinfo.sonde_humcorr[p.sonde_humcorr] + brk;
+
+
+    if (p.sonde_psensor && sondeinfo.sonde_psensor[p.sonde_psensor])
+        html +=  bold("pressure sensor:   ") + sondeinfo.sonde_psensor[p.sonde_psensor] + brk;
+    if (p.sonde_tsensor && sondeinfo.sonde_tsensor[p.sonde_tsensor])
+        html +=  bold("temperature sensor:   ") + sondeinfo.sonde_tsensor[p.sonde_tsensor] + brk;
+    if (p.sonde_hsensor && sondeinfo.sonde_hsensor[p.sonde_hsensor])
+        html +=  bold("humidity sensor:   ") + sondeinfo.sonde_hsensor[p.sonde_hsensor] + brk;
+    if (p.sonde_humcorr && sondeinfo.sonde_humcorr[p.sonde_humcorr])
+        html +=  bold("humidity correction:   ") + sondeinfo.sonde_humcorr[p.sonde_humcorr] + brk;
+
+    html += para + bold("Data reference:") + brk;
+    if (p.source)
+        html +=  bold("format:   ") + p.source + brk;
+    if (p.origin_member)
+        html +=  bold("file:   ") + p.origin_member + brk;
+    if (p.origin_archive)
+        html +=  bold("archive:   ") + p.origin_archive + brk;
+    if (p.fmt)
+        html +=  bold("file format:   ") + " version " + p.fmt + brk;
+
+    detail.innerHTML = html;
 }
 
 
@@ -136,13 +285,12 @@ function plotSkewT(geojson) {
     //var detailPane = $('#detailPane');
     genDetail(geojson.properties, 'detailPane');
 
+    genDownload(geojson);
+
     $('#skew-t').collapse('show')
     $('#detailPane').collapse('hide');
     $("#sidebar").show("slow");
 }
-
-
-
 
 function drawpath(feature) {
     var path_source = feature.properties.path_source;
@@ -178,6 +326,8 @@ function loadAscent(url, ascent, completion) {
     $.getJSON(url,
         (function(a) {
             return function(geojson) {
+                // add in the station name from stations
+                geojson.properties.station_name = stations[geojson.properties.station_id].properties.name;
                 a.data = geojson;
                 completion(geojson);
                 drawpath(geojson);
@@ -186,9 +336,15 @@ function loadAscent(url, ascent, completion) {
     );
 }
 
+function genFilename(a) {
+    var ts = new Date(a.properties.syn_timestamp * 1000).toJSON();
+    return a.properties.station_id + '_' + ts.substring(0, 10) + '_' + ts.substring(11, 16) + 'Z';
+}
+
 // toJSON: 2021-02-09T15:54:08.639Z
 function timeString(unxiTimestamp) {
     var ts = new Date(unxiTimestamp * 1000).toJSON();
+    console.log('timeString', ts);
     return ts.substring(0, 10) + ' ' + ts.substring(11, 16) + 'Z';
 }
 
@@ -203,32 +359,30 @@ function populateSidebar(feature) {
     }
     $('#sidebarTitle').html(feature.properties.name + appendix);
 
-    // clickable link
-    var a = document.createElement('a');
-    var link = document.createTextNode("station " + first.station_id);
-    a.appendChild(link);
-    a.title = "station " + first.station_id;
     // history dropdown
-    var history = document.getElementById('history');
-    history.innerHTML = '';
+    var ascentHistory = document.getElementById('ascentHistory');
+    ascentHistory.innerHTML = '';
 
-    var hasBUFR = false;
+    // var hasBUFR = false;
+    // $.each(feature.properties.ascents, function(index, ascent) {
+    //     if (ascent.source == "BUFR") {
+    //         hasBUFR = true;
+    //         return false;
+    //     }
+    // });
     $.each(feature.properties.ascents, function(index, ascent) {
-        if (ascent.source == "BUFR") {
-            hasBUFR = true;
-            return false;
-        }
-    });
-    $.each(feature.properties.ascents, function(index, ascent) {
-        if (hasBUFR && (ascent.source === "netCDF")) {
-            return true; // continue
-        }
         var a = document.createElement('a');
         a.classList.add('dropdown-item');
         a.classList.add('ascent-choice');
+        if (ascent.source === "netCDF") {
+            a.classList.add('dropdown-netcdf-item');
+        }
+        if (ascent.source === "BUFR") {
+            a.classList.add('dropdown-bufr-item');
+        }
         var text = document.createTextNode(timeString(ascent.syn_timestamp));
         a.appendChild(text);
-        history.appendChild(a);
+        ascentHistory.appendChild(a);
     });
     $('.ascent-choice').on('click', function() {
         console.log('click', $(this).text(), $(this).index());
@@ -243,12 +397,13 @@ function plotStation(feature, index) {
     var link = document.createTextNode("station " + ascent.station_id);
     var a = document.createElement('a');
 
-    a.href = "https://radiosonde.mah.priv.at/dev/?station=" + ascent.station_id +
-        "&timestamp=" + ascent.syn_timestamp;
-    a.appendChild(link);
-    $('#sidebarSubTitle').html(a);
-
-    $('#ascentChoice').html(timeString(ascent.syn_timestamp));
+    // a.href = "https://radiosonde.mah.priv.at/dev/?station=" + ascent.station_id +
+    //     "&timestamp=" + ascent.syn_timestamp;
+    // a.appendChild(link);
+    // $('#sidebarSubTitle').html(a);
+    var ts = timeString(ascent.syn_timestamp);
+    console.log('set #ascentChoice', ts);
+    $('#ascentChoice').html(ts);
     if (!ascent.hasOwnProperty('data')) {
         var p = datapath + ascent.path;
         loadAscent(p, ascent, plotSkewT);
@@ -370,17 +525,33 @@ function gotSummary(data) {
     }
 }
 
+function gotInfo(data) {
+    sondeinfo = data;
+}
+
+
 function failedSummary(jqXHR, textStatus, err) {
     console.log("failedSummary", textStatus, err);
 }
 
-function addStations() {
+function failedInfo(jqXHR, textStatus, err) {
+    console.log("failedInfo", textStatus, err);
+}
+
+function addMeta() {
     $.getJSON(summary_url)
         .done(function(data) {
             gotSummary(data);
         })
         .fail(function(jqXHR, textStatus, err) {
             failedSummary(jqXHR, textStatus, err);
+        });
+    $.getJSON(sondeinfo_url)
+        .done(function(data) {
+            gotInfo(data);
+        })
+        .fail(function(jqXHR, textStatus, err) {
+            failedInfo(jqXHR, textStatus, err);
         });
 }
 
@@ -394,7 +565,7 @@ function beforeMapLoads() {
         localStorage.setItem('agelimit', agelimit);
     }
     loadMap();
-    addStations();
+    addMeta();
 }
 
 var createDelayManager = function() {
@@ -420,6 +591,35 @@ var clearHighlight = function() {
     }
     highlight = null;
 };
+
+/**
+ * Given a valid GeoJSON object, return a CSV composed of all decodable points.
+ * @param {Object} geojson any GeoJSON object
+ * @param {string} delim CSV or DSV delimiter: by default, ","
+ * @param {boolean} [mixedGeometry=false] serialize just the properties
+ * of non-Point features.
+ * @example
+ * var csvString = geojson2dsv(geojsonObject)
+ */
+function geojson2dsv(geojson, delim, mixedGeometry) {
+    var rows = normalize(geojson).features
+        .map(function(feature) {
+            if (feature.geometry && feature.geometry.type === 'Point') {
+                return Object.assign({}, feature.properties, {
+                    lon: feature.geometry.coordinates[0],
+                    lat: feature.geometry.coordinates[1],
+                    ele: feature.geometry.coordinates[2]
+                });
+            }
+            if (mixedGeometry) {
+                return feature.properties;
+            }
+        })
+        .filter(Boolean);
+
+    return d3.dsvFormat(delim || ',').format(rows);
+}
+
 
 function afterMapLoads() {
 
@@ -622,13 +822,6 @@ function createContextMenus() {
     //     ctxmenu(e); // alert(e.latlng);
     // });
 }
-
-$('#detail').on('click', function(e) {
-
-
-    $('#detailPane').collapse('toggle');
-    $('#skew-t').collapse('toggle');
-});
 
 
 document.addEventListener("DOMContentLoaded", function(event) {

@@ -115,15 +115,6 @@
               <h5 class="card-title col-xs-8 col-md-8"><span id="sidebarTitle">Sidebar</span>
               </h5>
 
-
-              <!-- <div class="col-xs-1 col-md-1" id="share-wa" class="sharer  button  btn-xs "><i class="fa fa-2x fa-whatsapp"></i>
-              </div>
-
-              <div class="col-xs-1 col-md-1" id="share-wa" class="sharer  button  btn-xs "><i class="fa fa-2x fa-envelope-square"></i>
-              </div>
-              <div class="col-xs-1 col-md-1" id="share-wa" class="sharer  button  btn-xs "><i class="fa fa-chevron-left"></i>
-              </div> -->
-
               <div class="col-xs-1 col-md-1">
                 <button type="button" class="sharer btn btn-xs btn-default  pull-right" id="share-wa">
                   <i class="fa fa-1x fa-whatsapp"></i>
@@ -152,31 +143,7 @@
           </div>
 
           <div class="card-body">
-            <div class="row">
-              <div class="dropdown col-xs-6 col-md-6">
-                <button class="btn btn-primary dropdown-toggle " type="button" id="ascentChoice" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  Dropdown button
-                </button>
-                <div class="dropdown-menu" id="history">
-                </div>
-              </div>
 
-              <div class="col-xs-2 col-md-2">
-                <button id="detail" class="btn btn-info" type="button">
-                  Detail
-                </button>
-              </div>
-
-              <div class="dropdown col-xs-2 col-md-2">
-                <button class="btn btn-info dropdown-toggle " type="button" id="data-button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  Data
-                </button>
-                <div class="dropdown-menu" aria-labelledby="data-button" id="data">
-                  <a class="dropdown-item" href="#">Text</a>
-                  <a class="dropdown-item" href="#">GeoJSON</a>
-                </div>
-              </div>
-            </div>
 
             <div class="row">
               <div id="skew-t" class="collapse col-xs-12 col-md-12 skew-t" style="    width: 400px">
@@ -186,6 +153,37 @@
             <div class="row">
               <div class="card collapse col-xs-12 col-md-12 table table-sm " id="detailPane" aria-expanded="false">
               </div>
+            </div>
+
+            <div class="row btn-group dropup  card-body">
+
+              <div class="col-xs-6 col-md-6">
+                <button class="btn btn-primary dropdown-toggle" type="button" id="ascentChoice" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  List of ascents
+                </button>
+
+                <div class="dropdown-menu" id="ascentHistory" aria-labelledby="ascentChoice">
+                </div>
+              </div>
+
+              <div class="col-xs-3 col-md-3 " id="detail">
+                <button  class=" btn btn-info" type="button">
+                  Detail
+                </button>
+              </div>
+
+              <div class="col-xs-3 col-md-3 " id="download">
+                <button class="btn btn-info dropdown-toggle" type="button" id="downloadChoice" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Download
+                </button>
+                <div>
+                  <div class="dropdown-menu" aria-labelledby="downloadChoice">
+                    <a class="dropdown-item dowload-choice" href="#">CSV</a>
+                    <a class="dropdown-item dowload-choice" href="#">GeoJSON</a>
+                  </div>
+                </div>
+              </div>
+
             </div>
           </div>
         </div>
@@ -271,6 +269,9 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.7.1/jquery.contextMenu.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.7.1/jquery.contextMenu.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.7.1/jquery.ui.position.js"></script>
+
+  <script src="https://d3js.org/d3-dsv.v1.min.js"></script>
+  <script src="./src/js/normalize-geojson.js"></script>
 
   </div> -->
 
