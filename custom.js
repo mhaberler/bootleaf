@@ -1,7 +1,7 @@
 var toplevel = 'https://radiosonde.mah.priv.at/';
 var datadir = 'data-dev/';
 var datapath = toplevel + datadir;
-var summary_url = datapath + 'summary.geojson';
+var summary_url = datapath + 'summary-slim.geojson';
 var sondeinfo_url = toplevel + 'static/' + 'sondeinfo.json';
 var isTouchDevice = isMobile();
 var summary = null;
@@ -376,7 +376,7 @@ function plotStation(feature, index) {
     var a = document.createElement('a');
 
     if (!ascent.hasOwnProperty('data')) {
-        var u = dataURI(ascent.station_id, ascent);
+        var u = dataURI(feature.properties.station_id, ascent);
         loadAscent(u, ascent, plotSkewT);
     }
     else {
@@ -463,7 +463,7 @@ function gotSummary(data) {
                 delete f.origin_member;
                 delete f.origin_archive;
             }
-            stations[f.properties.ascents[0].station_id] = f;
+            stations[f.properties.station_id] = f;
             return true;
         },
         pointToLayer: function(feature, latlng) {
