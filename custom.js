@@ -94,7 +94,7 @@ function genDownload(ascent) {
     $('.dowload-choice').off();
     $('.dowload-choice').on('click', (function(e) {
         return function(e) {
-            var fn = genFilename(ascent);
+            var fn = genDownloadFilename(ascent);
             downloadObjectAs($(this).text(), ascent, fn)
         };
     }(ascent)));
@@ -240,7 +240,7 @@ function loadAscent(url, ascent, completion) {
     );
 }
 
-function genFilename(a) {
+function genDownloadFilename(a) {
     var ts = new Date(a.properties.syn_timestamp * 1000).toJSON();
     return a.properties.station_id + '_' + ts.substring(0, 10) + '_' + ts.substring(11, 16) + 'Z';
 }
