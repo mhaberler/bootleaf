@@ -8,8 +8,10 @@ var config = {
         "zoomControl": false
     },
     "about": {
-        "title": "Radiosonde ascents for the masses!",
-        "contents": "<p>see https://github.com/mhaberler/radiosonde</p>"
+        "title":  "Radiosonde ascents for the masses!",
+        "contents": ["<p>this app: https://github.com/mhaberler/radiosonde</p>",
+        "<p>Data source: https://github.com/mhaberler/radiosonde-datacollector</p>",
+        ]
     },
     "controls": {
         "zoom": {
