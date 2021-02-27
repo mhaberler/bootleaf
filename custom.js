@@ -248,11 +248,20 @@ function genFilename(a) {
 // toJSON: 2021-02-09T15:54:08.639Z
 function timeString(unxiTimestamp) {
     var ts = new Date(unxiTimestamp * 1000).toJSON();
-    console.log('timeString', ts);
     return ts.substring(0, 10) + ' ' + ts.substring(11, 16) + 'Z';
 }
 
-function populateSidebar(feature) {
+// due to setup errors of various stations, the same ascents
+// might be reported via MADIS and GISC but with different timestamps.
+// usually it's an hour apart and it seems to be mostly a German problem
+// see the Meining, Muenchen-Oberschleissheim and Budapest stations
+// for examples
+// on the theory that no station flies ascents less than ascentFuzzValue
+// seconds apart, we silently drop the netCDF ascent within that timeframe
+// provided the preferBUFR is true.
+var ascentFuzzValue = 3650;
+
+function populateSidebar(feature, preferBUFR) {
 
     $('.ascent-choice').off('click');
 
@@ -267,14 +276,28 @@ function populateSidebar(feature) {
     var ascentHistory = document.getElementById('ascentHistory');
     ascentHistory.innerHTML = '';
 
+    var lastBUFRtime = -1;
     $.each(feature.properties.ascents, function(index, ascent) {
         var a = document.createElement('a');
+        a.setAttribute('index-value', index);
         a.classList.add('dropdown-item');
         a.classList.add('ascent-choice');
+
         if (ascent.source === "netCDF") {
+            // BUFR ascents are always before netCDF ascents with the same timestamp
+            // (summary.geojson sorting order)
+            if (preferBUFR &&
+                (lastBUFRtime > 0) &&
+                (Math.abs(ascent.syn_timestamp - lastBUFRtime) < ascentFuzzValue)) {
+                console.log("skip BUFR", ascent.syn_timestamp)
+                return;
+            } else {
+                console.log("add BUFR",lastBUFRtime, ascent.syn_timestamp)
+            }
             a.classList.add('dropdown-netcdf-item');
         }
         if (ascent.source === "BUFR") {
+            lastBUFRtime = ascent.syn_timestamp;
             a.classList.add('dropdown-bufr-item');
         }
         var text = document.createTextNode(timeString(ascent.syn_timestamp));
@@ -282,8 +305,8 @@ function populateSidebar(feature) {
         ascentHistory.appendChild(a);
     });
     $('.ascent-choice').on('click', function() {
-        console.log('click', $(this).text(), $(this).index());
-        plotStation(feature, $(this).index());
+        console.log('click', $(this).text(),$(this).index(), $(this).attr('index-value'));
+        plotStation(feature, $(this).attr('index-value'));
     })
 }
 
@@ -332,12 +355,32 @@ function markerClicked(l) {
         fillColor: markerSelectedColor
     });
     selectedMarker = marker;
-    populateSidebar(marker.feature);
+    populateSidebar(marker.feature, $('#preferBUFR').val());
     plotStation(marker.feature, 0);
     // this pan should happen only after the sidebar is visible
     bootleaf.map.panTo(marker.getLatLng());
     console.log(marker.getLatLng());
 }
+
+$('input[id="preferBUFR"]').mouseover(function() {
+  $(this).attr("title", "prefer BUFR-based ascents over netCDF-based files of identical time");
+});
+
+$(function () {
+    var data = localStorage.getItem("preferBUFR");
+    if (data !== null) {
+        $("input[id='preferBUFR']").attr("checked", "checked");
+    }
+});
+
+$('#preferBUFR').change(function() {
+    if (this.checked) {
+        localStorage.setItem("preferBUFR", 1);
+    } else {
+        localStorage.removeItem("preferBUFR");
+    }
+    populateSidebar(selectedMarker.feature, this.checked);
+});
 
 function isMobile() {
     // device detection
