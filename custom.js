@@ -277,9 +277,13 @@ function populateSidebar(feature, preferBUFR) {
     ascentHistory.innerHTML = '';
 
     var lastBUFRtime = -1;
-    $.each(feature.properties.ascents, function(index, ascent) {
+    var len = feature.properties.ascents.length;
+    for (var i = 0; i < len; i++) {
+
+//    $.each(feature.properties.ascents, function(index, ascent) {
+        ascent = feature.properties.ascents[i];
         var a = document.createElement('a');
-        a.setAttribute('index-value', index);
+        a.setAttribute('index-value', i);
         a.classList.add('dropdown-item');
         a.classList.add('ascent-choice');
 
@@ -303,7 +307,7 @@ function populateSidebar(feature, preferBUFR) {
         var text = document.createTextNode(timeString(ascent.syn_timestamp));
         a.appendChild(text);
         ascentHistory.appendChild(a);
-    });
+    };
     $('.ascent-choice').on('click', function() {
         console.log('click', $(this).text(),$(this).index(), $(this).attr('index-value'));
         plotStation(feature, $(this).attr('index-value'));
