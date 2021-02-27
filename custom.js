@@ -6,7 +6,6 @@ var sondeinfo_url = toplevel + 'static/' + 'sondeinfo.json';
 var isTouchDevice = isMobile();
 var summary = null;
 var markers = null;
-var saveMemory = isTouchDevice;
 var stations = {}; // features indexed by station_id
 var sondeinfo = {};
 var markerList = [];
@@ -458,11 +457,6 @@ function gotSummary(data) {
         filter: function(f) {
             if (!f.properties.ascents.length) // no ascents available
                 return false;
-            if (saveMemory) {
-                // delete attrs
-                delete f.origin_member;
-                delete f.origin_archive;
-            }
             stations[f.properties.station_id] = f;
             return true;
         },
