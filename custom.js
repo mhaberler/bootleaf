@@ -1,7 +1,7 @@
 var toplevel = 'https://radiosonde.mah.priv.at/';
-var datadir = 'data-dev/';
+var datadir = 'data/';
 var datapath = toplevel + datadir;
-var summary_url = datapath + 'summary-slim.geojson';
+var summary_url = datapath + 'summary.geojson';
 var sondeinfo_url = toplevel + 'static/' + 'sondeinfo.json';
 var isTouchDevice = isMobile();
 var summary = null;
