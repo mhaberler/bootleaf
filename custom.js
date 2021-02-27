@@ -340,6 +340,34 @@ function populateSidebar(feature, preferBUFR) {
     })
 }
 
+var source_map = {
+    netCDF: "madis/",
+    BUFR: "gisc/",
+    madis: "madis/",
+    gisc: "gisc/"
+};
+function genDownloadFilename(a) {
+    var ts = new Date(a.properties.syn_timestamp * 1000).toJSON();
+    return a.properties.station_id + '_' + ts.substring(0, 10) + '_' + ts.substring(11, 16) + 'Z';
+}
+
+// toJSON: 2021-02-09T15:54:08.639Z
+function dataURI(sid, ascent) {
+    var ts = new Date(ascent.syn_timestamp * 1000).toJSON();
+    return datapath +
+        source_map[ascent.source] +
+        sid.substring(0,2) + "/" +
+        sid.substring(2,5) + "/" +
+        sid + "_" +
+        ts.substring(0, 4) +
+        ts.substring(5, 7) +
+        ts.substring(8, 10) + "_" +
+        ts.substring(11, 13) +
+        ts.substring(14, 16) +
+        ts.substring(17, 19) +
+        ".geojson";
+}
+
 function plotStation(feature, index) {
 
     var ascent = feature.properties.ascents[index];
@@ -347,13 +375,9 @@ function plotStation(feature, index) {
     var link = document.createTextNode("station " + ascent.station_id);
     var a = document.createElement('a');
 
-    // var ts = timeString(ascent.syn_timestamp);
-    // console.log('set #ascentChoice', ts);
-    // $('#ascentChoice').html(ts);
-
     if (!ascent.hasOwnProperty('data')) {
-        var p = datapath + ascent.path;
-        loadAscent(p, ascent, plotSkewT);
+        var u = dataURI(ascent.station_id, ascent);
+        loadAscent(u, ascent, plotSkewT);
     }
     else {
         plotSkewT(ascent.data);
@@ -386,7 +410,6 @@ function markerClicked(l) {
         fillColor: markerSelectedColor
     });
     selectedMarker = marker;
-    // $('#preferBUFR').val();
     var pref =  $('#preferBUFR').prop('checked');
     console.log("markerClick: preferBUFR= ", pref);
     populateSidebar(marker.feature, pref);
