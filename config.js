@@ -10,6 +10,7 @@ var config = {
     "about": {
         "title":  "Radiosonde ascents for the masses!",
         "contents": ["<p>this app: https://github.com/mhaberler/radiosonde</p>",
+        "<p>Skew-T by rittels: https://www.npmjs.com/package/skewt-plus</p>",
         "<p>Data source: https://github.com/mhaberler/radiosonde-datacollector</p>",
         ]
     },
