@@ -386,12 +386,12 @@ div.dt-buttons {
   padding: 0 .5em;
 }
 
-.dropdown-bufr-item{
+.dropdown-BUFR-item{
   background-color: #bee5eb;
   /* color: #fff; */
 }
 
-.dropdown-netcdf-item{
+.dropdown-netCDF-item{
   background-color: #ffeeba;
   /* color: #fff; */
 }
