@@ -105,7 +105,7 @@ function bold(s) {
 }
 
 function minutes(sec) {
-    var m = sec/60;
+    var m = sec / 60;
     return round(m);
 }
 
@@ -120,7 +120,7 @@ function genDetail(fc, container) {
     if (p.id_type == "mobile")
         s += " (mobile)";
     if (p.id_type == "wmo")
-            s += " (WMO id: " + p.station_id +")";
+        s += " (WMO id: " + p.station_id + ")";
 
     html = bold(s) + para + para;
     html += bold("elevation:   ") + p.elevation + "m" + brk;
@@ -136,44 +136,44 @@ function genDetail(fc, container) {
         html += "   simulated";
 
     html += brk;
-    html +=  bold("Synoptic time:   ") + timeString(p.syn_timestamp) + brk;
+    html += bold("Synoptic time:   ") + timeString(p.syn_timestamp) + brk;
     if (p.firstSeen)
-        html +=  bold("First seen:   ") + timeString(p.firstSeen) + brk;
+        html += bold("First seen:   ") + timeString(p.firstSeen) + brk;
     if (p.lastSeen)
-        html +=  bold("Last seen:   ") + timeString(p.lastSeen) +
-            " (" + minutes(p.lastSeen - p.firstSeen) + " min later)" + brk;
+        html += bold("Last seen:   ") + timeString(p.lastSeen) +
+        " (" + minutes(p.lastSeen - p.firstSeen) + " min later)" + brk;
 
     html += para + bold("Sonde:") + brk;
     if (p.sonde_type && sondeinfo.sonde_types[p.sonde_type])
-        html +=  bold("type:   ") + sondeinfo.sonde_types[p.sonde_type] + brk;
+        html += bold("type:   ") + sondeinfo.sonde_types[p.sonde_type] + brk;
     if (p.sonde_serial)
-        html +=  bold("serial number:   ") + p.sonde_serial + brk;
+        html += bold("serial number:   ") + p.sonde_serial + brk;
     if (p.sonde_frequency)
-        html +=  bold("transmit frequency:   ") + round3(p.sonde_frequency/1000)/1000 + " MHz" + brk;
+        html += bold("transmit frequency:   ") + round3(p.sonde_frequency / 1000) / 1000 + " MHz" + brk;
     if (p.sonde_swversion)
-            html +=  bold("SW version:   ") + p.sonde_swversion + brk;
+        html += bold("SW version:   ") + p.sonde_swversion + brk;
     if (p.sonde_humcorr && sondeinfo.sonde_humcorr[p.sonde_humcorr])
-        html +=  bold("humidity correction:   ") + sondeinfo.sonde_humcorr[p.sonde_humcorr] + brk;
+        html += bold("humidity correction:   ") + sondeinfo.sonde_humcorr[p.sonde_humcorr] + brk;
 
 
     if (p.sonde_psensor && sondeinfo.sonde_psensor[p.sonde_psensor])
-        html +=  bold("pressure sensor:   ") + sondeinfo.sonde_psensor[p.sonde_psensor] + brk;
+        html += bold("pressure sensor:   ") + sondeinfo.sonde_psensor[p.sonde_psensor] + brk;
     if (p.sonde_tsensor && sondeinfo.sonde_tsensor[p.sonde_tsensor])
-        html +=  bold("temperature sensor:   ") + sondeinfo.sonde_tsensor[p.sonde_tsensor] + brk;
+        html += bold("temperature sensor:   ") + sondeinfo.sonde_tsensor[p.sonde_tsensor] + brk;
     if (p.sonde_hsensor && sondeinfo.sonde_hsensor[p.sonde_hsensor])
-        html +=  bold("humidity sensor:   ") + sondeinfo.sonde_hsensor[p.sonde_hsensor] + brk;
+        html += bold("humidity sensor:   ") + sondeinfo.sonde_hsensor[p.sonde_hsensor] + brk;
     if (p.sonde_humcorr && sondeinfo.sonde_humcorr[p.sonde_humcorr])
-        html +=  bold("humidity correction:   ") + sondeinfo.sonde_humcorr[p.sonde_humcorr] + brk;
+        html += bold("humidity correction:   ") + sondeinfo.sonde_humcorr[p.sonde_humcorr] + brk;
 
     html += para + bold("Data reference:") + brk;
     if (p.source)
-        html +=  bold("format:   ") + p.source + brk;
+        html += bold("format:   ") + p.source + brk;
     if (p.origin_member)
-        html +=  bold("file:   ") + p.origin_member + brk;
+        html += bold("file:   ") + p.origin_member + brk;
     if (p.origin_archive)
-        html +=  bold("archive:   ") + p.origin_archive + brk;
+        html += bold("archive:   ") + p.origin_archive + brk;
     if (p.fmt)
-        html +=  bold("file format:   ") + " version " + p.fmt + brk;
+        html += bold("file format:   ") + " version " + p.fmt + brk;
 
     detail.innerHTML = html;
 }
@@ -253,16 +253,30 @@ function timeString(unxiTimestamp) {
 
 // due to setup errors of various stations, the same ascents
 // might be reported via MADIS and GISC but with different timestamps.
+// there is no such thing as  a unique ascent UUID.
 // usually it's an hour apart and it seems to be mostly a German problem
 // see the Meining, Muenchen-Oberschleissheim and Budapest stations
 // for examples
 // on the theory that no station flies ascents less than ascentFuzzValue
 // seconds apart, we silently drop the netCDF ascent within that timeframe
-// provided the preferBUFR is true.
+// provided the preferBUFR flag is true.
 var ascentFuzzValue = 3650;
+var firstItem = -1;
+
+function ascentItem(ts, klass, index) {
+    if (firstItem < 0)
+        firstItem = index;
+    var a = document.createElement('a');
+    a.setAttribute('index-value', index);
+    a.classList.add('dropdown-item');
+    a.classList.add('ascent-choice');
+    a.classList.add(klass);
+    a.appendChild(document.createTextNode(timeString(ts)));
+    return a;
+}
 
 function populateSidebar(feature, preferBUFR) {
-
+    firstItem = -1;
     $('.ascent-choice').off('click');
 
     var first = feature.properties.ascents[0];
@@ -279,38 +293,50 @@ function populateSidebar(feature, preferBUFR) {
     var lastBUFRtime = -1;
     var len = feature.properties.ascents.length;
     for (var i = 0; i < len; i++) {
-
-//    $.each(feature.properties.ascents, function(index, ascent) {
-        ascent = feature.properties.ascents[i];
-        var a = document.createElement('a');
-        a.setAttribute('index-value', i);
-        a.classList.add('dropdown-item');
-        a.classList.add('ascent-choice');
-
-        if (ascent.source === "netCDF") {
-            // BUFR ascents are always before netCDF ascents with the same timestamp
-            // (summary.geojson sorting order)
-            if (preferBUFR &&
-                (lastBUFRtime > 0) &&
-                (Math.abs(ascent.syn_timestamp - lastBUFRtime) < ascentFuzzValue)) {
-                console.log("skip BUFR", ascent.syn_timestamp)
-                return;
-            } else {
-                console.log("add BUFR",lastBUFRtime, ascent.syn_timestamp)
+        var ascent = feature.properties.ascents[i];
+        var doublette = false;
+        if (i < (len - 1)) {
+            if ((feature.properties.ascents[i].source !=
+                    feature.properties.ascents[i + 1].source) &&
+                Math.abs(feature.properties.ascents[i + 1].syn_timestamp -
+                    feature.properties.ascents[i].syn_timestamp) < ascentFuzzValue) {
+                // different sources and two ascents
+                // within the ascentFuzzValue time span found
+                doublette = true;
             }
-            a.classList.add('dropdown-netcdf-item');
         }
-        if (ascent.source === "BUFR") {
-            lastBUFRtime = ascent.syn_timestamp;
-            a.classList.add('dropdown-bufr-item');
+        if (!preferBUFR || !doublette) {
+            // normal case - list them all
+            ascentHistory.appendChild(ascentItem(ascent.syn_timestamp,
+                "dropdown-" + ascent.source + "-item", i));
+            continue;
         }
-        var text = document.createTextNode(timeString(ascent.syn_timestamp));
-        a.appendChild(text);
-        ascentHistory.appendChild(a);
-    };
+        // we preferBUFR
+        if (doublette) {
+            if (ascent.source == 'netCDF') {
+                // add the second one which is the BUFR
+                ascentHistory.appendChild(ascentItem(feature.properties.ascents[i + 1].syn_timestamp,
+                    "dropdown-" + feature.properties.ascents[i + 1].source + "-item", i+1));
+                i += 1;
+                continue;
+            }
+            // else take the first one
+            ascentHistory.appendChild(ascentItem(feature.properties.ascents[i].syn_timestamp,
+                "dropdown-" + feature.properties.ascents[i].source + "-item", i));
+            // and skip the netcCDF entry
+            i += 1;
+            continue;
+        }
+    }
+    var ts = timeString(feature.properties.ascents[firstItem].syn_timestamp);
+    $('#ascentChoice').html(ts);
+
     $('.ascent-choice').on('click', function() {
-        console.log('click', $(this).text(),$(this).index(), $(this).attr('index-value'));
-        plotStation(feature, $(this).attr('index-value'));
+        var selected = $(this).attr('index-value');
+        var ts = timeString(feature.properties.ascents[selected].syn_timestamp);
+        $('#ascentChoice').html(ts);
+        console.log('click',selected, ts);
+        plotStation(feature, selected);
     })
 }
 
@@ -321,9 +347,10 @@ function plotStation(feature, index) {
     var link = document.createTextNode("station " + ascent.station_id);
     var a = document.createElement('a');
 
-    var ts = timeString(ascent.syn_timestamp);
-    console.log('set #ascentChoice', ts);
-    $('#ascentChoice').html(ts);
+    // var ts = timeString(ascent.syn_timestamp);
+    // console.log('set #ascentChoice', ts);
+    // $('#ascentChoice').html(ts);
+
     if (!ascent.hasOwnProperty('data')) {
         var p = datapath + ascent.path;
         loadAscent(p, ascent, plotSkewT);
@@ -359,28 +386,30 @@ function markerClicked(l) {
         fillColor: markerSelectedColor
     });
     selectedMarker = marker;
-    populateSidebar(marker.feature, $('#preferBUFR').val());
-    plotStation(marker.feature, 0);
+    // $('#preferBUFR').val();
+    var pref =  $('#preferBUFR').prop('checked');
+    console.log("markerClick: preferBUFR= ", pref);
+    populateSidebar(marker.feature, pref == "on");
+    plotStation(marker.feature, firstItem);
     // this pan should happen only after the sidebar is visible
     bootleaf.map.panTo(marker.getLatLng());
-    console.log(marker.getLatLng());
+    // console.log(marker.getLatLng());
 }
 
 $('input[id="preferBUFR"]').mouseover(function() {
-  $(this).attr("title", "prefer BUFR-based ascents over netCDF-based files of identical time");
+    $(this).attr("title", "prefer BUFR-based ascents over netCDF-based of nearly identical time (1h)");
 });
 
-$(function () {
+$(function() {
     var data = localStorage.getItem("preferBUFR");
-    if (data !== null) {
-        $("input[id='preferBUFR']").attr("checked", "checked");
-    }
+    $("input[id='preferBUFR']").prop('checked', data);
 });
 
 $('#preferBUFR').change(function() {
     if (this.checked) {
         localStorage.setItem("preferBUFR", 1);
-    } else {
+    }
+    else {
         localStorage.removeItem("preferBUFR");
     }
     populateSidebar(selectedMarker.feature, this.checked);
@@ -463,6 +492,7 @@ function gotSummary(data) {
             });
         }
         else {
+            // FIXME populate sidebar
             plotStation(f, 0);
         }
     }
