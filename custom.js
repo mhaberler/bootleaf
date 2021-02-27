@@ -389,7 +389,7 @@ function markerClicked(l) {
     // $('#preferBUFR').val();
     var pref =  $('#preferBUFR').prop('checked');
     console.log("markerClick: preferBUFR= ", pref);
-    populateSidebar(marker.feature, pref == "on");
+    populateSidebar(marker.feature, pref);
     plotStation(marker.feature, firstItem);
     // this pan should happen only after the sidebar is visible
     bootleaf.map.panTo(marker.getLatLng());
