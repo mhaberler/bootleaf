@@ -1,7 +1,6 @@
 "use strict";
 var toplevel = 'https://radiosonde.mah.priv.at/';
-var datadir = 'data-deep/';
-//var datadir = 'data/';
+var datadir = 'data/';
 var datapath = toplevel + datadir;
 var summary_url = datapath + 'summary.geojson';
 var sondeinfo_url = toplevel + 'static/' + 'sondeinfo.json';
