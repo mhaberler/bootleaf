@@ -1,3 +1,4 @@
+"use strict";
 var toplevel = 'https://radiosonde.mah.priv.at/';
 var datadir = 'data-deep/';
 //var datadir = 'data/';
@@ -20,14 +21,7 @@ var maxHrs = 48;
 var agelimit;
 var agelimitDefault = -24;
 
-var MarkerOptions = {
-    radius: 10,
-    color: "#000",
-    weight: 1,
-    opacity: 1,
-    fillOpacity: 0.8,
-    className: "context-menu-marker"
-};
+
 var markerSelectedColor = "OrangeRed";
 var viridisStops = ['#440154', '#482777', '#3F4A8A', '#31678E', '#26838F', '#1F9D8A', '#6CCE5A', '#B6DE2B', '#FEE825'];
 var chroma_scale = chroma.scale(viridisStops);
@@ -128,28 +122,30 @@ function genDetail(fc, container) {
     if (p.id_type == "wmo")
         s += " (WMO id: " + p.station_id + ")";
 
-// https://www.google.com/maps/search/?api=1&query=latitude,longitude
+    // https://www.google.com/maps/search/?api=1&query=latitude,longitude
 
     html = bold(s) + para + para;
     var lat, lon, ns, ew;
     if (p.lat > 0) {
         ns = "N";
         lat = p.lat;
-    } else {
+    }
+    else {
         ns = "S";
-        lat = - p.lat;
+        lat = -p.lat;
     }
     if (p.lon > 0) {
         ew = "E";
         lon = p.lon;
-    }  else  {
+    }
+    else {
         ew = "W";
         lon = -p.lon;
     }
     html += bold("location:   ") +
-        "<a targe=\"_blank\" href=\"https://www.google.com/maps/search/?api=1&zoom=12&query="
-        + p.lat + "," + p.lon+ "\">"
-        + round6(lat) + ns + " " + round6(lon) + ew + " </a>" + brk;
+        "<a targe=\"_blank\" href=\"https://www.google.com/maps/search/?api=1&zoom=12&query=" +
+        p.lat + "," + p.lon + "\">" +
+        round6(lat) + ns + " " + round6(lon) + ew + " </a>" + brk;
 
     html += bold("elevation:   ") + p.elevation + "m" + brk;
     if (p.text)
@@ -344,7 +340,7 @@ function populateSidebar(feature, preferBUFR) {
             if (ascent.source == 'netCDF') {
                 // add the second one which is the BUFR
                 ascentHistory.appendChild(ascentItem(feature.properties.ascents[i + 1].syn_timestamp,
-                    "dropdown-" + feature.properties.ascents[i + 1].source + "-item", i+1));
+                    "dropdown-" + feature.properties.ascents[i + 1].source + "-item", i + 1));
                 i += 1;
                 continue;
             }
@@ -363,7 +359,7 @@ function populateSidebar(feature, preferBUFR) {
         var selected = $(this).attr('index-value');
         var ts = timeString(feature.properties.ascents[selected].syn_timestamp);
         $('#ascentChoice').html(ts);
-        console.log('click',selected, ts);
+        console.log('click', selected, ts);
         plotStation(feature, selected);
     })
 }
@@ -374,6 +370,7 @@ var source_map = {
     madis: "madis/",
     gisc: "gisc/"
 };
+
 function genDownloadFilename(a) {
     var ts = new Date(a.properties.syn_timestamp * 1000).toJSON();
     return a.properties.station_id + '_' + ts.substring(0, 10) + '_' + ts.substring(11, 16) + 'Z';
@@ -385,8 +382,8 @@ function dataURI(sid, ascent) {
     if (summaryFmt < 4) {
         return datapath +
             source_map[ascent.source] +
-            sid.substring(0,2) + "/" +
-            sid.substring(2,5) + "/" +
+            sid.substring(0, 2) + "/" +
+            sid.substring(2, 5) + "/" +
             sid + "_" +
             ts.substring(0, 4) +
             ts.substring(5, 7) +
@@ -395,11 +392,12 @@ function dataURI(sid, ascent) {
             ts.substring(14, 16) +
             ts.substring(17, 19) +
             ".geojson";
-    } else {
+    }
+    else {
         return datapath +
             source_map[ascent.source] +
-            sid.substring(0,2) + "/" +
-            sid.substring(2,5) + "/" +
+            sid.substring(0, 2) + "/" +
+            sid.substring(2, 5) + "/" +
 
             ts.substring(0, 4) + "/" +
             ts.substring(5, 7) + "/" +
@@ -451,13 +449,14 @@ function markerClicked(l) {
             fillColor: selectedMarker.properties.color,
         });
     }
-    marker = l.target;
+    var marker = l.target;
     marker.properties.color = marker.options.fillColor;
+
     marker.setStyle({
         fillColor: markerSelectedColor
     });
     selectedMarker = marker;
-    var pref =  $('#preferBUFR').prop('checked');
+    var pref = $('#preferBUFR').prop('checked');
     console.log("markerClick: preferBUFR= ", pref);
     populateSidebar(marker.feature, pref);
     plotStation(marker.feature, firstItem);
@@ -498,6 +497,22 @@ function now() {
     return Math.floor(Date.now() / 1000);
 }
 
+function latlngFromAscent(a) {
+        return L.latLng(a.lat, a.lon);
+}
+
+function determineHeading(f) {
+    var l = f.properties.ascents.length;
+    if (l < 2)
+        return 0;
+    var second = Math.min(l-1, 4);
+    var ll1 =latlngFromAscent(f.properties.ascents[0]);
+    var ll2 =latlngFromAscent(f.properties.ascents[second]);
+
+    console.log(ll1,ll2);
+    return L.GeometryUtil.bearing(ll2, ll1);
+
+}
 
 function gotSummary(data) {
     // console.log("gotSummary", data);
@@ -520,9 +535,33 @@ function gotSummary(data) {
             var age_index = Math.round(Math.min(age_hrs, maxHrs - 1));
             age_index = Math.max(age_index, 0);
             var rounded_age = Math.round(age_hrs * 10) / 10;
-            MarkerOptions.fillColor = chroma_scale(1 - age_index / maxHrs);
+            var markerColor = chroma_scale(1 - age_index / maxHrs);
+            var marker;
 
-            var marker = L.circleMarker(latlng, MarkerOptions);
+            if (feature.properties.id_type === "mobile") {
+
+                marker = L.boatMarker(latlng, {
+                    fillColor: markerColor, // color of the boat
+                    idleCircle: false, // if set to true, the icon will draw a circle if
+                    // boatspeed == 0 and the ship-shape if speed > 0
+                    // className: "context-menu-marker"
+                    className: "context-menu-marker",
+                });
+                var h = determineHeading(feature);
+                marker.setHeading(h);
+                console.log("mobile:", feature.properties.name, latlng, h);
+            }
+            else {
+                marker = L.circleMarker(latlng, {
+                    fillColor: markerColor,
+                    radius: 10,
+                    color: "#000",
+                    weight: 1,
+                    opacity: 1,
+                    fillOpacity: 0.8,
+                    className: "context-menu-marker"
+                });
+            }
             var layergroup = L.layerGroup([marker]);
 
             marker.properties = {};
@@ -668,7 +707,11 @@ function updateMarkers(agelimit) {
     markerGroups.forEach(function(group, index) {
         var marker;
         for (var layer of group.getLayers()) {
-            if (layer instanceof L.CircleMarker) {
+            if ((layer instanceof L.CircleMarker)) {
+                marker = layer;
+                break;
+            }
+            if ((layer instanceof L.Marker)) {
                 marker = layer;
                 break;
             }
