@@ -121,7 +121,29 @@ function genDetail(fc, container) {
     if (p.id_type == "wmo")
         s += " (WMO id: " + p.station_id + ")";
 
+// https://www.google.com/maps/search/?api=1&query=latitude,longitude
+
     html = bold(s) + para + para;
+    var lat, lon, ns, ew;
+    if (p.lat > 0) {
+        ns = "N";
+        lat = p.lat;
+    } else {
+        ns = "S";
+        lat = - p.lat;
+    }
+    if (p.lon > 0) {
+        ew = "E";
+        lon = p.lon;
+    }  else  {
+        ew = "W";
+        lon = -p.lon;
+    }
+    html += bold("location:   ") +
+        "<a targe=\"_blank\" href=\"https://www.google.com/maps/search/?api=1&zoom=12&query="
+        + p.lat + "," + p.lon+ "\">"
+        + lat + ns + " " + lon + ew + " </a>" + brk;
+
     html += bold("elevation:   ") + p.elevation + "m" + brk;
     if (p.text)
         html += bold("text:   ") + p.text + brk;
