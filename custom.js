@@ -1,10 +1,13 @@
 var toplevel = 'https://radiosonde.mah.priv.at/';
-var datadir = 'data/';
+var datadir = 'data-deep/';
+//var datadir = 'data/';
 var datapath = toplevel + datadir;
 var summary_url = datapath + 'summary.geojson';
 var sondeinfo_url = toplevel + 'static/' + 'sondeinfo.json';
 var isTouchDevice = isMobile();
 var summary = null;
+var summaryFmt = 0;
+var summaryGenerated = 0;
 var markers = null;
 var stations = {}; // features indexed by station_id
 var sondeinfo = {};
@@ -53,7 +56,11 @@ function uv2dir(u, v) {
 }
 
 function round3(value) {
-    return Math.round(value * 1000) / 1000
+    return Math.round(value * 1000) / 1000;
+}
+
+function round6(value) {
+    return Math.round(value * 1000000) / 1000000;
 }
 
 // https://stackoverflow.com/questions/19721439/download-json-object-as-a-file-from-browser
@@ -142,7 +149,7 @@ function genDetail(fc, container) {
     html += bold("location:   ") +
         "<a targe=\"_blank\" href=\"https://www.google.com/maps/search/?api=1&zoom=12&query="
         + p.lat + "," + p.lon+ "\">"
-        + lat + ns + " " + lon + ew + " </a>" + brk;
+        + round6(lat) + ns + " " + round6(lon) + ew + " </a>" + brk;
 
     html += bold("elevation:   ") + p.elevation + "m" + brk;
     if (p.text)
@@ -375,18 +382,37 @@ function genDownloadFilename(a) {
 // toJSON: 2021-02-09T15:54:08.639Z
 function dataURI(sid, ascent) {
     var ts = new Date(ascent.syn_timestamp * 1000).toJSON();
-    return datapath +
-        source_map[ascent.source] +
-        sid.substring(0,2) + "/" +
-        sid.substring(2,5) + "/" +
-        sid + "_" +
-        ts.substring(0, 4) +
-        ts.substring(5, 7) +
-        ts.substring(8, 10) + "_" +
-        ts.substring(11, 13) +
-        ts.substring(14, 16) +
-        ts.substring(17, 19) +
-        ".geojson";
+    if (summaryFmt < 4) {
+        return datapath +
+            source_map[ascent.source] +
+            sid.substring(0,2) + "/" +
+            sid.substring(2,5) + "/" +
+            sid + "_" +
+            ts.substring(0, 4) +
+            ts.substring(5, 7) +
+            ts.substring(8, 10) + "_" +
+            ts.substring(11, 13) +
+            ts.substring(14, 16) +
+            ts.substring(17, 19) +
+            ".geojson";
+    } else {
+        return datapath +
+            source_map[ascent.source] +
+            sid.substring(0,2) + "/" +
+            sid.substring(2,5) + "/" +
+
+            ts.substring(0, 4) + "/" +
+            ts.substring(5, 7) + "/" +
+
+            sid + "_" +
+            ts.substring(0, 4) +
+            ts.substring(5, 7) +
+            ts.substring(8, 10) + "_" +
+            ts.substring(11, 13) +
+            ts.substring(14, 16) +
+            ts.substring(17, 19) +
+            ".geojson";
+    }
 }
 
 function plotStation(feature, index) {
@@ -472,9 +498,13 @@ function now() {
     return Math.floor(Date.now() / 1000);
 }
 
+
 function gotSummary(data) {
     // console.log("gotSummary", data);
     summary = data;
+    summaryFmt = summary.properties.fmt;
+    summaryGenerated = summary.properties.generated;
+
     markers = L.geoJson(data, {
         filter: function(f) {
             if (!f.properties.ascents.length) // no ascents available
