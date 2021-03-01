@@ -52,8 +52,8 @@ L.BoatIcon = L.Icon.extend({
 	draw: function(ctx, w, h) {
 		if(!ctx) return;
 
-		console.log("course", this.options.course,
-		 	"lastHeading",this.lastHeading, "ctx", this.ctx);
+		// console.log("course", this.options.course,
+		//  	"lastHeading",this.lastHeading, "ctx", this.ctx);
 		var x = this.x;
 		var y = this.y;
 

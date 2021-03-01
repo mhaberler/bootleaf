@@ -11,7 +11,7 @@ var summaryGenerated = 0;
 var markers = null;
 var stations = {}; // features indexed by station_id
 var sondeinfo = {};
-var markerList = [];
+var mobileMarkerList = [];
 var markerGroups = [];
 let zeroK = 273.15;
 let drawAscents = 1;
@@ -358,7 +358,6 @@ function populateSidebar(feature, preferBUFR) {
         var selected = $(this).attr('index-value');
         var ts = timeString(feature.properties.ascents[selected].syn_timestamp);
         $('#ascentChoice').html(ts);
-        console.log('click', selected, ts);
         plotStation(feature, selected);
     })
 }
@@ -456,7 +455,6 @@ function markerClicked(l) {
     });
     selectedMarker = marker;
     var pref = $('#preferBUFR').prop('checked');
-    console.log("markerClick: preferBUFR= ", pref);
     populateSidebar(marker.feature, pref);
     plotStation(marker.feature, firstItem);
     // this pan should happen only after the sidebar is visible
@@ -504,11 +502,10 @@ function determineHeading(f) {
     var l = f.properties.ascents.length;
     if (l < 2)
         return 0;
+
     var second = Math.min(l-1, 4);
     var ll1 =latlngFromAscent(f.properties.ascents[0]);
     var ll2 =latlngFromAscent(f.properties.ascents[second]);
-
-    console.log(ll1,ll2);
     return L.GeometryUtil.bearing(ll2, ll1);
 
 }
@@ -518,6 +515,7 @@ function gotSummary(data) {
     summary = data;
     summaryFmt = summary.properties.fmt;
     summaryGenerated = summary.properties.generated;
+    mobileMarkerList = [];
 
     markers = L.geoJson(data, {
         filter: function(f) {
@@ -544,11 +542,12 @@ function gotSummary(data) {
                     idleCircle: false, // if set to true, the icon will draw a circle if
                     // boatspeed == 0 and the ship-shape if speed > 0
                     // className: "context-menu-marker"
-                    className: "context-menu-marker",
+                    className: "zoomable-icon",
                 });
+                mobileMarkerList.push(marker);
                 var h = determineHeading(feature);
                 marker.setHeading(h);
-                console.log("mobile:", feature.properties.name, latlng, h);
+                // console.log("mobile:", feature.properties.name, latlng, h);
             }
             else {
                 marker = L.circleMarker(latlng, {
@@ -566,7 +565,6 @@ function gotSummary(data) {
             marker.properties = {};
             marker.properties.visible = false;
 
-            markerList.push(marker);
             markerGroups.push(layergroup);
 
             var appendix = "";
@@ -699,6 +697,31 @@ function afterMapLoads() {
         fadeoutManager(closeBookmark, bookmarkLife, e);
     });
     createAgeSlider(markers);
+
+
+    //var layer = '';//define the layer that contains the markers
+    bootleaf.map.on('zoomend', function() {
+        var currentZoom = bootleaf.map.getZoom();
+        console.log("zoom=", currentZoom);
+
+        // mobileMarkerList.forEach(function(marker, index) {
+        //     console.log("zooming", marker);
+        // });
+
+        var newzoom = '' + (2*(currentZoom)) +'px';
+        $('#map .zoomable-icon').css({'width':newzoom,'height':newzoom});
+
+
+        // //Update X and Y based on zoom level
+        // var x= 50; //Update x
+        // var y= 50; //Update Y
+        // var LeafIcon = L.Icon.extend({
+        //     options: {
+        //         iconSize:     [x, y] // Change icon size according to zoom level
+        //     }
+        // });
+        // layer.setIcon(LeafIcon);
+    });
     $("#loading").hide();
 }
 
@@ -732,6 +755,9 @@ function updateMarkers(agelimit) {
     });
     localStorage.setItem('agelimit', agelimit);
 }
+
+
+
 
 function createAgeSlider(markers) {
 
