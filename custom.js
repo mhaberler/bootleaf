@@ -221,7 +221,7 @@ function plotSkewT(geojson) {
             "dwpt": round3(p['dewpoint'] - zeroK),
         };
 
-        if ((typeof p.wind_u === "undefined") || (typeof p.wind_u === "undefined")) {
+        if ((typeof p.wind_u === "undefined") || (typeof p.wind_v === "undefined")) {
             data.push(sample);
             continue;
         }
