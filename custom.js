@@ -206,16 +206,11 @@ function genDetail(fc, container) {
 
 
 function plotSkewT(geojson) {
-    var data = [];
-    var pscale = 1.;
-    if (geojson.properties.fmt < 2)
-        pscale = 0.01;
 
     for (var i in geojson.features) {
         var p = geojson.features[i].properties;
-        var press = p['pressure'];
         var sample = {
-            "press": round3(press * pscale),
+            "press": round3(p['pressure']),
             "hght": round3(p['gpheight']),
             "temp": round3(p['temp'] - zeroK),
             "dwpt": round3(p['dewpoint'] - zeroK),
