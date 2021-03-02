@@ -250,12 +250,54 @@ function drawpath(feature) {
     L.polyline(lineCoordinate, path_colors[path_source]).addTo(bootleaf.map);
 }
 
+function hotfix(geojson) {
+
+    // bring legacy detail files up to current fmt -
+    // fix geojson objects in-place depending on various bug conditions:
+
+    var fix_u_v = ((geojson.properties.source === 'netCDF') &&
+                   (geojson.properties.fmt < 5));
+
+    var fix_pressure = ((geojson.properties.source === 'BUFR') &&
+                   (geojson.properties.fmt < 2));
+
+    // walk the object and apply any fixes known for this version
+    for (var i in geojson.features) {
+        var p = geojson.features[i].properties;
+
+        // pre-V2 BUFR files had pressure in Pa
+        // make it hPa
+        if (fix_pressure) {
+            p.pressure = p.pressure * 0.01;
+        }
+
+        // pre-V5 netCDF files had u,v in knots
+        // make it m/s
+        if (fix_u_v) {
+            if (typeof p.wind_u !== "undefined") {
+                p.wind_u = p.wind_u / 1.94384;
+            }
+            if (typeof p.wind_u !== "undefined") {
+                p.wind_u = p.wind_u / 1.94384;
+            }
+        }
+    }
+    // set the fmt to the current fmt so this is
+    // idempotent
+    geojson.properties.fmt = summaryFmt;
+
+    console.log("fix_u_v", fix_u_v);
+    console.log("fix_pressure", fix_pressure);
+}
+
+
 var skewt = new SkewT('#skew-t');
 
 function loadAscent(url, ascent, completion) {
     $.getJSON(url,
         (function(a) {
             return function(geojson) {
+                hotfix(geojson);
                 // add in the station name from stations
                 geojson.properties.station_name = stations[geojson.properties.station_id].properties.name;
                 a.data = geojson;
