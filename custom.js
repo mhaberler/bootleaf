@@ -250,31 +250,6 @@ function drawpath(feature) {
     L.polyline(lineCoordinate, path_colors[path_source]).addTo(bootleaf.map);
 }
 
-function hotfix(gj) {
-
-    // pre-fmt5 ascents in netCDF format need wind_u + wind_v divided by  1.94384
-    for (var i in geojson.features) {
-        var p = geojson.features[i].properties;
-        var sample = {
-            "press": round3(p['pressure']),
-            "hght": round3(p['gpheight']),
-            "temp": round3(p['temp'] - zeroK),
-            "dwpt": round3(p['dewpoint'] - zeroK),
-        };
-
-        if ((typeof p.wind_u === "undefined") || (typeof p.wind_u === "undefined")) {
-            data.push(sample);
-            continue;
-        }
-        sample["wdir"] = round3(uv2dir(p['wind_u'], p['wind_v']));
-        sample["wspd"] = round3(uv2speed(p['wind_u'], p['wind_v']));
-        data.push(sample);
-    }
-
-
-}
-
-
 var skewt = new SkewT('#skew-t');
 
 function loadAscent(url, ascent, completion) {
