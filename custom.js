@@ -166,6 +166,9 @@ function genDetail(fc, container) {
         html += bold("Last seen:   ") + timeString(p.lastSeen) +
         " (" + minutes(p.lastSeen - p.firstSeen) + " min later)" + brk;
 
+    if (p.processed)
+            html += bold("Online:   ") + timeString(p.processed) +
+            " (" + minutes(p.processed - p.lastSeen) + " min after last seen)" + brk;
     html += para + bold("Sonde:") + brk;
     if (p.sonde_type && sondeinfo.sonde_types[p.sonde_type])
         html += bold("type:   ") + sondeinfo.sonde_types[p.sonde_type] + brk;
