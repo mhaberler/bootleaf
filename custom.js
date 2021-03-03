@@ -99,7 +99,7 @@ function genDownload(ascent) {
     $('.dowload-choice').off();
     $('.dowload-choice').on('click', (function(e) {
         return function(e) {
-            var fn = genDownloadFilename(ascent);
+            var fn = DownloadFilename(ascent);
             downloadObjectAs($(this).text(), ascent, fn)
         };
     }(ascent)));
@@ -309,9 +309,16 @@ function loadAscent(url, ascent, completion) {
     );
 }
 
-function genDownloadFilename(a) {
+// 2021-03-03T00:00:00.000Z//
+//29231_2021_03030000Z
+function DownloadFilename(a) {
     var ts = new Date(a.properties.syn_timestamp * 1000).toJSON();
-    return a.properties.station_id + '_' + ts.substring(0, 10) + '_' + ts.substring(11, 16) + 'Z';
+    return (a.properties.station_id + '_' +
+        ts.substring(0, 4) +
+        ts.substring(5, 7) +
+        ts.substring(8, 10) + '_' +
+        ts.substring(11, 13) +
+        ts.substring(14, 16) + 'Z').replace(/-/g, '_');
 }
 
 // toJSON: 2021-02-09T15:54:08.639Z
