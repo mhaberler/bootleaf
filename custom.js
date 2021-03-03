@@ -212,7 +212,7 @@ function genDetail(fc, container) {
 
 
 function plotSkewT(geojson) {
-
+    var samples = [];
     for (var i in geojson.features) {
         var p = geojson.features[i].properties;
         var sample = {
@@ -223,14 +223,14 @@ function plotSkewT(geojson) {
         };
 
         if ((typeof p.wind_u === "undefined") || (typeof p.wind_v === "undefined")) {
-            data.push(sample);
+            samples.push(sample);
             continue;
         }
         sample["wdir"] = round3(uv2dir(p['wind_u'], p['wind_v']));
         sample["wspd"] = round3(uv2speed(p['wind_u'], p['wind_v']));
-        data.push(sample);
+        samples.push(sample);
     }
-    skewt.plot(data);
+    skewt.plot(samples);
     genDetail(geojson, 'detailPane');
     genDownload(geojson);
 
@@ -513,8 +513,8 @@ $('input[id="preferBUFR"]').mouseover(function() {
 });
 
 $(function() {
-    var data = localStorage.getItem("preferBUFR");
-    $("input[id='preferBUFR']").prop('checked', data);
+    var preferBUFRdata = localStorage.getItem("preferBUFR");
+    $("input[id='preferBUFR']").prop('checked', preferBUFRdata);
 });
 
 $('#preferBUFR').change(function() {
