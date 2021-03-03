@@ -415,11 +415,6 @@ var source_map = {
     gisc: "gisc/"
 };
 
-function genDownloadFilename(a) {
-    var ts = new Date(a.properties.syn_timestamp * 1000).toJSON();
-    return a.properties.station_id + '_' + ts.substring(0, 10) + '_' + ts.substring(11, 16) + 'Z';
-}
-
 // toJSON: 2021-02-09T15:54:08.639Z
 function dataURI(sid, ascent) {
     var ts = new Date(ascent.syn_timestamp * 1000).toJSON();
