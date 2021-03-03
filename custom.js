@@ -3,6 +3,7 @@ var toplevel = 'https://radiosonde.mah.priv.at/';
 var datadir = 'data/';
 var datapath = toplevel + datadir;
 var summary_url = datapath + 'summary.geojson';
+var summary_br = 'summary.geojson.br';
 var sondeinfo_url = toplevel + 'static/' + 'sondeinfo.json';
 var isTouchDevice = isMobile();
 var summary = null;
@@ -177,8 +178,8 @@ function genDetail(fc, container) {
         " (" + minutes(p.lastSeen - p.firstSeen) + " min later)" + brk;
 
     if (p.processed)
-            html += bold("Online:   ") + timeString(p.processed) +
-            " (" + minutes(p.processed - p.lastSeen) + " min after last seen)" + brk;
+        html += bold("Online:   ") + timeString(p.processed) +
+        " (" + minutes(p.processed - p.lastSeen) + " min after last seen)" + brk;
     html += para + bold("Sonde:") + brk;
     if (p.sonde_type && sondeinfo.sonde_types[p.sonde_type])
         html += bold("type:   ") + sondeinfo.sonde_types[p.sonde_type] + brk;
@@ -261,10 +262,10 @@ function hotfix(geojson) {
     // fix geojson objects in-place depending on various bug conditions:
 
     var fix_u_v = ((geojson.properties.source === 'netCDF') &&
-                   (geojson.properties.fmt < 5));
+        (geojson.properties.fmt < 5));
 
     var fix_pressure = ((geojson.properties.source === 'BUFR') &&
-                   (geojson.properties.fmt < 2));
+        (geojson.properties.fmt < 2));
 
     // walk the object and apply any fixes known for this version
     for (var i in geojson.features) {
@@ -549,7 +550,7 @@ function now() {
 }
 
 function latlngFromAscent(a) {
-        return L.latLng(a.lat, a.lon);
+    return L.latLng(a.lat, a.lon);
 }
 
 function determineHeading(f) {
@@ -557,9 +558,9 @@ function determineHeading(f) {
     if (l < 2)
         return 0;
 
-    var second = Math.min(l-1, 4);
-    var ll1 =latlngFromAscent(f.properties.ascents[0]);
-    var ll2 =latlngFromAscent(f.properties.ascents[second]);
+    var second = Math.min(l - 1, 4);
+    var ll1 = latlngFromAscent(f.properties.ascents[0]);
+    var ll2 = latlngFromAscent(f.properties.ascents[second]);
     return L.GeometryUtil.bearing(ll2, ll1);
 
 }
@@ -762,8 +763,11 @@ function afterMapLoads() {
         //     console.log("zooming", marker);
         // });
 
-        var newzoom = '' + (2*(currentZoom)) +'px';
-        $('#map .zoomable-icon').css({'width':newzoom,'height':newzoom});
+        var newzoom = '' + (2 * (currentZoom)) + 'px';
+        $('#map .zoomable-icon').css({
+            'width': newzoom,
+            'height': newzoom
+        });
 
 
         // //Update X and Y based on zoom level
