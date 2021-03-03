@@ -19,6 +19,10 @@ var bookmarkLife = 2000;
 var maxHrs = 48;
 var agelimit;
 var agelimitDefault = -24;
+var slowTick, fastTick;
+var slowTickInterval = 900 * 1000; // 15min
+var fastTickInterval = 5 * 1000;
+var maxAge = 3600; //delete ascent.data after an hour
 
 
 var markerSelectedColor = "OrangeRed";
