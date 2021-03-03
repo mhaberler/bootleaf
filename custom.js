@@ -773,7 +773,40 @@ function afterMapLoads() {
         // layer.setIcon(LeafIcon);
     });
     $("#loading").hide();
+
+    // start a background task
+    // clear with clearInterval(intervalId);
+    slowTick = setInterval(function() {
+        // console.log("slow tick");
+        slowTickHandler();
+    }, slowTickInterval);
+
+    fastTick = setInterval(function() {
+        // console.log("fast tick");
+        fastTickHandler();
+    }, fastTickInterval);
 }
+
+function slowTickHandler() {
+    // read the directory and check the timestamp on <toplevel>/data/summary.geojson.br
+    //
+    // the web server is configured to return directory listings as JSON
+    // unfortunately mtime comes in RFC1123 format
+    $.getJSON(toplevel + datadir, function(dirlist) {
+        dirlist.forEach(function(entry, index) {
+            if (entry.name === summary_br) {
+                var ts = moment.utc(entry.mtime, 'ddd, DD MMM YYYY HH:mm:ss').unix();
+                if (ts > summaryGenerated + 30) {
+                    $.growl.notice({
+                        title: "new ascents available",
+                        message: "click reload to update"
+                    });
+                }
+            }
+        });
+        console.log("dirlist", dirlist);
+    });
+};
 
 // as ascents are clicked, ascent.data accumumulatess
 // delete data which has not been referenced in a while
