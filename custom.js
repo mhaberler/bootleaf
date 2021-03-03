@@ -302,6 +302,7 @@ function loadAscent(url, ascent, completion) {
                 // add in the station name from stations
                 geojson.properties.station_name = stations[geojson.properties.station_id].properties.name;
                 a.data = geojson;
+                a.data.properties.last_reference = unixTimestamp();
                 completion(geojson);
                 drawpath(geojson);
             };
@@ -472,6 +473,7 @@ function plotStation(feature, index) {
     }
     else {
         plotSkewT(ascent.data);
+        ascent.data.properties.last_reference = unixTimestamp();
     }
 }
 
@@ -772,6 +774,28 @@ function afterMapLoads() {
     });
     $("#loading").hide();
 }
+
+// as ascents are clicked, ascent.data accumumulatess
+// delete data which has not been referenced in a while
+// to avoid memory usage growing forever
+// doubles as an example how to walk all ascents
+function fastTickHandler() {
+    summary.features.forEach(function(station, si) {
+        station.properties.ascents.forEach(function(ascent, ai) {
+            if (ascent.hasOwnProperty('data')) {
+                if (ascent.data.properties.hasOwnProperty('last_reference')) {
+                    var age = unixTimestamp() - ascent.data.properties.last_reference;
+                    if (age > maxAge) {
+                        // console.log("cleanup: ",
+                        //     ascent.data.properties.station_name,
+                        //     timeString(ascent.data.properties.syn_timestamp));
+                        delete ascent.data;
+                    }
+                }
+            }
+        });
+    });
+};
 
 function updateMarkers(agelimit) {
     markerGroups.forEach(function(group, index) {
