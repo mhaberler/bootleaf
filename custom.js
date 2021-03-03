@@ -283,8 +283,8 @@ function hotfix(geojson) {
             if (typeof p.wind_u !== "undefined") {
                 p.wind_u = p.wind_u / 1.94384;
             }
-            if (typeof p.wind_u !== "undefined") {
-                p.wind_u = p.wind_u / 1.94384;
+            if (typeof p.wind_v !== "undefined") {
+                p.wind_v = p.wind_v / 1.94384;
             }
         }
     }
