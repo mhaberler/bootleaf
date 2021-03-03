@@ -33,6 +33,12 @@ var path_colors = {
     }
 }
 
+function unixTimestamp() {
+    return Math.round((new Date()).getTime() / 1000);
+}
+
+
+
 function uv2speed(u, v) {
     return Math.sqrt(u * u + v * v);
 }
