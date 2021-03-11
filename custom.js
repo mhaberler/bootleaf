@@ -626,8 +626,13 @@ function gotSummary(data) {
             if (ascent.id_type == "mobile") {
                 appendix = " (mobile)";
             }
-
-            var content = "<b>" + feature.properties.name + "</b>" + appendix + "<br>  " + rounded_age + " hours old";
+            var sid = "";
+            if (feature.properties.name != feature.properties.station_id) {
+                sid = "station " + feature.properties.station_id + "<br>  ";
+            }
+            var content = "<b>" + feature.properties.name + "</b>" + appendix + "<br>  " +
+            sid  +
+            rounded_age + " hours old";
             if (isTouchDevice) {
                 marker.on('click', markerClicked);
             }
