@@ -187,7 +187,7 @@ function genDetail(fc, container) {
         " (" + minutes(p.processed - p.arrived) + " min after arrival)" + brk;
     
     html += para + bold("Sonde:") + brk;
-    if (p.sonde_type && sondeinfo.sonde_types[p.sonde_type])
+    if (('sonde_type' in p)   && sondeinfo.sonde_types[p.sonde_type])
         html += bold("type:   ") + sondeinfo.sonde_types[p.sonde_type] + brk;
     if (p.sonde_serial)
         html += bold("serial number:   ") + p.sonde_serial + brk;
@@ -195,19 +195,22 @@ function genDetail(fc, container) {
         html += bold("transmit frequency:   ") + round3(p.sonde_frequency / 1000) / 1000 + " MHz" + brk;
     if (p.sonde_swversion)
         html += bold("SW version:   ") + p.sonde_swversion + brk;
-    if (p.sonde_humcorr && sondeinfo.sonde_humcorr[p.sonde_humcorr])
+    if (('sonde_humcorr' in p) && sondeinfo.sonde_humcorr[p.sonde_humcorr])
         html += bold("humidity correction:   ") + sondeinfo.sonde_humcorr[p.sonde_humcorr] + brk;
 
 
-    if (p.sonde_psensor && sondeinfo.sonde_psensor[p.sonde_psensor])
+    if (('sonde_psensor' in p) && sondeinfo.sonde_psensor[p.sonde_psensor])
         html += bold("pressure sensor:   ") + sondeinfo.sonde_psensor[p.sonde_psensor] + brk;
-    if (p.sonde_tsensor && sondeinfo.sonde_tsensor[p.sonde_tsensor])
+    if (('sonde_tsensor' in p) && sondeinfo.sonde_tsensor[p.sonde_tsensor])
         html += bold("temperature sensor:   ") + sondeinfo.sonde_tsensor[p.sonde_tsensor] + brk;
-    if (p.sonde_hsensor && sondeinfo.sonde_hsensor[p.sonde_hsensor])
+    if (('sonde_hsensor' in p) && sondeinfo.sonde_hsensor[p.sonde_hsensor])
         html += bold("humidity sensor:   ") + sondeinfo.sonde_hsensor[p.sonde_hsensor] + brk;
-    if (p.sonde_humcorr && sondeinfo.sonde_humcorr[p.sonde_humcorr])
+    if (('sonde_humcorr' in p) && sondeinfo.sonde_humcorr[p.sonde_humcorr])
         html += bold("humidity correction:   ") + sondeinfo.sonde_humcorr[p.sonde_humcorr] + brk;
 
+    if (('sonde_gepot' in p) && sondeinfo.sonde_gepot[p.sonde_gepot])
+        html += bold("geopotential height:   ") + sondeinfo.sonde_gepot[p.sonde_gepot] + brk;
+    
     html += para + bold("Data reference:") + brk;
     if (p.channel)
 	html += bold("source:   ") + p.channel + brk;
