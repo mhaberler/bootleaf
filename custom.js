@@ -42,8 +42,6 @@ function unixTimestamp() {
     return Math.round((new Date()).getTime() / 1000);
 }
 
-
-
 function uv2speed(u, v) {
     return Math.sqrt(u * u + v * v);
 }
@@ -177,10 +175,13 @@ function genDetail(fc, container) {
         html += bold("Last seen:   ") + timeString(p.lastSeen) +
         " (" + minutes(p.lastSeen - p.firstSeen) + " min later)" + brk;
 
-    if (p.arrived)
-        html += bold("Arrived:   ") + timeString(p.arrived) + brk;
-
-    
+    if (p.arrived) {
+        html += bold("Arrived:   ") + timeString(p.arrived);
+	if (p.lastSeen) {
+	         html +=   " (" + minutes(p.arrived - p.lastSeen) + " min after last seen)";
+	}
+	html += brk;
+    }
     if (p.processed)
         html += bold("Online:   ") + timeString(p.processed) +
         " (" + minutes(p.processed - p.arrived) + " min after arrival)" + brk;
