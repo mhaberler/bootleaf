@@ -1,6 +1,6 @@
 "use strict";
 var toplevel = 'https://radiosonde.mah.priv.at/';
-var datadir = 'data/';
+var datadir = 'data-v2/';
 var datapath = toplevel + datadir;
 var summary_url = datapath + 'summary.geojson';
 var summary_br = 'summary.geojson.br';
@@ -177,9 +177,14 @@ function genDetail(fc, container) {
         html += bold("Last seen:   ") + timeString(p.lastSeen) +
         " (" + minutes(p.lastSeen - p.firstSeen) + " min later)" + brk;
 
+    if (p.arrived)
+        html += bold("Arrived:   ") + timeString(p.arrived) + brk;
+
+    
     if (p.processed)
         html += bold("Online:   ") + timeString(p.processed) +
-        " (" + minutes(p.processed - p.lastSeen) + " min after last seen)" + brk;
+        " (" + minutes(p.processed - p.arrived) + " min after arrival)" + brk;
+    
     html += para + bold("Sonde:") + brk;
     if (p.sonde_type && sondeinfo.sonde_types[p.sonde_type])
         html += bold("type:   ") + sondeinfo.sonde_types[p.sonde_type] + brk;
@@ -203,14 +208,15 @@ function genDetail(fc, container) {
         html += bold("humidity correction:   ") + sondeinfo.sonde_humcorr[p.sonde_humcorr] + brk;
 
     html += para + bold("Data reference:") + brk;
-    if (p.source)
-        html += bold("format:   ") + p.source + brk;
+    if (p.channel)
+	html += bold("source:   ") + p.channel + brk;
+    html += bold("format:   ") + p.repfmt + "/" + p.encoding + brk;
     if (p.origin_member)
-        html += bold("file:   ") + p.origin_member + brk;
+        html += bold("source file:   ") + p.origin_member + brk;
     if (p.origin_archive)
-        html += bold("archive:   ") + p.origin_archive + brk;
+        html += bold("source archive:   ") + p.origin_archive + brk;
     if (p.fmt)
-        html += bold("file format:   ") + " version " + p.fmt + brk;
+        html += bold("detail file format:   ") + " version " + p.fmt + brk;
 
     detail.innerHTML = html;
 }
@@ -218,6 +224,7 @@ function genDetail(fc, container) {
 
 function plotSkewT(geojson) {
     var samples = [];
+    var windsamples = 0;
     for (var i in geojson.features) {
         var p = geojson.features[i].properties;
         var sample = {
@@ -233,15 +240,17 @@ function plotSkewT(geojson) {
         }
         sample["wdir"] = round3(uv2dir(p['wind_u'], p['wind_v']));
         sample["wspd"] = round3(uv2speed(p['wind_u'], p['wind_v']));
+	windsamples += 1;
         samples.push(sample);
     }
     skewt.plot(samples);
     genDetail(geojson, 'detailPane');
     genDownload(geojson);
-
+    
     $('#skew-t').collapse('show')
     $('#detailPane').collapse('hide');
     $("#sidebar").show("slow");
+    console.log("wind samples:", windsamples);
 }
 
 function drawpath(feature) {
@@ -261,10 +270,10 @@ function hotfix(geojson) {
     // bring legacy detail files up to current fmt -
     // fix geojson objects in-place depending on various bug conditions:
 
-    var fix_u_v = ((geojson.properties.source === 'netCDF') &&
+    var fix_u_v = ((geojson.properties.repfmt === 'fm35') &&
         (geojson.properties.fmt < 5));
 
-    var fix_pressure = ((geojson.properties.source === 'BUFR') &&
+    var fix_pressure = ((geojson.properties.repfmt === 'fm94') &&
         (geojson.properties.fmt < 2));
 
     // walk the object and apply any fixes known for this version
@@ -378,8 +387,8 @@ function populateSidebar(feature, preferBUFR) {
         var ascent = feature.properties.ascents[i];
         var doublette = false;
         if (i < (len - 1)) {
-            if ((feature.properties.ascents[i].source !=
-                    feature.properties.ascents[i + 1].source) &&
+            if ((feature.properties.ascents[i].repfmt !=
+                    feature.properties.ascents[i + 1].repfmt) &&
                 Math.abs(feature.properties.ascents[i + 1].syn_timestamp -
                     feature.properties.ascents[i].syn_timestamp) < ascentFuzzValue) {
                 // different sources and two ascents
@@ -390,21 +399,21 @@ function populateSidebar(feature, preferBUFR) {
         if (!preferBUFR || !doublette) {
             // normal case - list them all
             ascentHistory.appendChild(ascentItem(ascent.syn_timestamp,
-                "dropdown-" + ascent.source + "-item", i));
+                "dropdown-" + ascent.repfmt + "-item", i));
             continue;
         }
         // we preferBUFR
         if (doublette) {
-            if (ascent.source == 'netCDF') {
+            if (ascent.repfmt == 'fm35') {
                 // add the second one which is the BUFR
                 ascentHistory.appendChild(ascentItem(feature.properties.ascents[i + 1].syn_timestamp,
-                    "dropdown-" + feature.properties.ascents[i + 1].source + "-item", i + 1));
+                    "dropdown-" + feature.properties.ascents[i + 1].repfmt + "-item", i + 1));
                 i += 1;
                 continue;
             }
             // else take the first one
             ascentHistory.appendChild(ascentItem(feature.properties.ascents[i].syn_timestamp,
-                "dropdown-" + feature.properties.ascents[i].source + "-item", i));
+                "dropdown-" + feature.properties.ascents[i].repfmt + "-item", i));
             // and skip the netcCDF entry
             i += 1;
             continue;
@@ -444,8 +453,8 @@ function dataURI(sid, ascent) {
             ts.substring(14, 16) +
             ts.substring(17, 19) +
             ".geojson";
-    }
-    else {
+    };
+    if (summaryFmt < 6) {
         return datapath +
             source_map[ascent.source] +
             sid.substring(0, 2) + "/" +
@@ -463,6 +472,22 @@ function dataURI(sid, ascent) {
             ts.substring(17, 19) +
             ".geojson";
     }
+        return datapath +
+            ascent.repfmt + "/" +
+            sid.substring(0, 2) + "/" +
+            sid.substring(2, 5) + "/" +
+
+            ts.substring(0, 4) + "/" +
+            ts.substring(5, 7) + "/" +
+
+            sid + "_" +
+            ts.substring(0, 4) +
+            ts.substring(5, 7) +
+            ts.substring(8, 10) + "_" +
+            ts.substring(11, 13) +
+            ts.substring(14, 16) +
+            ts.substring(17, 19) +
+            ".geojson";
 }
 
 function plotStation(feature, index) {
@@ -638,7 +663,7 @@ function gotSummary(data) {
             }
             else {
                 marker.bindTooltip(content, {
-                        className: ascent.source + 'CSSClass'
+                        className: ascent.repfmt + 'CSSClass'
                     }).openTooltip()
                     .on('click', markerClicked);
                 //                        .on('mouseover', mouseover);
