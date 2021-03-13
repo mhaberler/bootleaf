@@ -112,9 +112,11 @@ function bold(s) {
     return "<b>" + s + "</b>";
 }
 
-function minutes(sec) {
+function minsec(sec) {
+    if (sec < 60)
+	return sec + " sec";
     var m = sec / 60;
-    return round(m);
+    return round(m) + " min";
 }
 
 function genDetail(fc, container) {
@@ -173,19 +175,19 @@ function genDetail(fc, container) {
         html += bold("First seen:   ") + timeString(p.firstSeen) + brk;
     if (p.lastSeen)
         html += bold("Last seen:   ") + timeString(p.lastSeen) +
-        " (" + minutes(p.lastSeen - p.firstSeen) + " min later)" + brk;
+        " (" + minsec(p.lastSeen - p.firstSeen) + " later)" + brk;
 
     if (p.arrived) {
         html += bold("Arrived:   ") + timeString(p.arrived);
 	if (p.lastSeen) {
-	         html +=   " (" + minutes(p.arrived - p.lastSeen) + " min after last seen)";
+	    html +=   " (" + minsec(p.arrived - p.lastSeen) + " after last seen)";
 	}
 	html += brk;
     }
-    if (p.processed)
+    if (p.processed) {
         html += bold("Online:   ") + timeString(p.processed) +
-        " (" + minutes(p.processed - p.arrived) + " min after arrival)" + brk;
-    
+        " (" + minsec(p.processed - p.arrived) + " min after arrival)" + brk;
+    }
     html += para + bold("Sonde:") + brk;
     if (('sonde_type' in p)   && sondeinfo.sonde_types[p.sonde_type])
         html += bold("type:   ") + sondeinfo.sonde_types[p.sonde_type] + brk;
@@ -667,7 +669,7 @@ function gotSummary(data) {
             }
             else {
                 marker.bindTooltip(content, {
-                        className: ascent.repfmt + 'CSSClass'
+		    className: "dropdown-" + ascent.repfmt + "-item"
                     }).openTooltip()
                     .on('click', markerClicked);
                 //                        .on('mouseover', mouseover);
