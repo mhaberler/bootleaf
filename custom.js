@@ -17,7 +17,7 @@ var markerGroups = [];
 let zeroK = 273.15;
 let drawAscents = 1;
 var bookmarkLife = 2000;
-var maxHrs = 48;
+var maxHrs = 72;
 var agelimit;
 var agelimitDefault = -24;
 var slowTick, fastTick;
@@ -170,7 +170,11 @@ function genDetail(fc, container) {
         html += "   simulated";
 
     html += brk;
-    html += bold("Synoptic time:   ") + timeString(p.syn_timestamp) + brk;
+    var rounded_age = Math.round(((now() - p.syn_timestamp) / 3600)*10)/10;
+    html += bold("Synoptic time:   ") + timeString(p.syn_timestamp)
+    + " (" + rounded_age + " hours old)" +  brk;
+
+    
     if (p.firstSeen)
         html += bold("First seen:   ") + timeString(p.firstSeen) + brk;
     if (p.lastSeen)
