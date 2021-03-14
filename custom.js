@@ -190,7 +190,7 @@ function genDetail(fc, container) {
     }
     if (p.processed) {
         html += bold("Online:   ") + timeString(p.processed) +
-        " (" + minsec(p.processed - p.arrived) + " min after arrival)" + brk;
+        " (" + minsec(p.processed - p.arrived) + " after arrival)" + brk;
     }
     html += para + bold("Sonde:") + brk;
     if (('sonde_type' in p)   && sondeinfo.sonde_types[p.sonde_type])
