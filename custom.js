@@ -225,6 +225,8 @@ function genDetail(fc, container) {
         html += bold("source file:   ") + p.origin_member + brk;
     if (p.origin_archive)
         html += bold("source archive:   ") + p.origin_archive + brk;
+    if (p.gts_topic)
+        html += bold("GTS topic:   ") + p.gts_topic + brk;
     if (p.fmt)
         html += bold("detail file format:   ") + " version " + p.fmt + brk;
 
