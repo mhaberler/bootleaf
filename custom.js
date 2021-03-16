@@ -216,6 +216,10 @@ function genDetail(fc, container) {
 
     if (('sonde_gepot' in p) && sondeinfo.sonde_gepot[p.sonde_gepot])
         html += bold("geopotential height:   ") + sondeinfo.sonde_gepot[p.sonde_gepot] + brk;
+
+    if (('sonde_term' in p) && sondeinfo.sonde_term[p.sonde_term])
+        html += bold("termination reason:   ") + sondeinfo.sonde_term[p.sonde_term] + brk;
+
     
     html += para + bold("Data reference:") + brk;
     if (p.channel)
