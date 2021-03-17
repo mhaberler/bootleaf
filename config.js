@@ -18,13 +18,14 @@ var config = {
         "zoom": {
             "position": "topleft"
         },
-        "leafletGeocoder": {
-            //https://github.com/perliedman/leaflet-control-geocoder
-            "collapsed": false,
-            "position": "topleft",
-            "placeholder": "Search for a location or station id",
-            "type": "WmoId",
-        },
+        // "leafletGeocoder": {
+        //     //https://github.com/perliedman/leaflet-control-geocoder
+        //     "collapsed": false,
+        //     "position": "topleft",
+        //     "placeholder": "Search for a location or station id",
+        //     "type": "WmoId",
+	//     "defaultMarkGeocode": false
+        // },
         "bookmarks": {
             "position": "bottomright",
             "places": [{

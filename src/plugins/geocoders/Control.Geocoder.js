@@ -675,7 +675,13 @@ var leafletControlGeocoder = (function (L) {
           results[index] = {
             name: f.properties.name + " (wmo " + f.properties.station_id + ")",
             bbox: center.toBounds(this.options.sizeInMeters),
-            center: center
+            center: center,
+            properties: {
+              station_id: f.properties.station_id,
+              name: f.properties.name,
+              id_type: f.properties.id_type
+            } // 
+
           }; // only the first 5 results
 
           if (index > 5) break;
