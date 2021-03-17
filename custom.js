@@ -606,14 +606,15 @@ function determineHeading(f) {
 
 }
 
-function gotSummary(data) {
-    // console.log("gotSummary", data);
-    summary = data;
-    summaryFmt = summary.properties.fmt;
-    summaryGenerated = summary.properties.generated;
-    mobileMarkerList = [];
+function gotSummary(summary) {
+    // console.log("gotSummary", summary);
+    var summaryFmt = summary.properties.fmt;
+    var summaryGenerated = summary.properties.generated;
+    var mobileMarkerList = [];
 
-    markers = L.geoJson(data, {
+    bootleaf.leafletGeocoder.options.geocoder.options.summary = summary;
+    
+    markers = L.geoJson(summary, {
         filter: function(f) {
             if (!f.properties.ascents.length) // no ascents available
                 return false;
