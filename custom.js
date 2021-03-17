@@ -488,8 +488,8 @@ function dataURI(sid, ascent) {
             ts.substring(17, 19) +
             ".geojson";
     }
-        return datapath +
-            ascent.repfmt + "/" +
+    return datapath +
+        ascent.repfmt + "/" +
             sid.substring(0, 2) + "/" +
             sid.substring(2, 5) + "/" +
 
@@ -606,13 +606,64 @@ function determineHeading(f) {
 
 }
 
+
 function gotSummary(summary) {
     // console.log("gotSummary", summary);
-    var summaryFmt = summary.properties.fmt;
+    summaryFmt = summary.properties.fmt;
     var summaryGenerated = summary.properties.generated;
     var mobileMarkerList = [];
 
-    bootleaf.leafletGeocoder.options.geocoder.options.summary = summary;
+    // bootleaf.leafletGeocoder.options.geocoder.options.summary = summary;
+    // bootleaf.leafletGeocoder.options.geocoder.on('markgeocode', function(e) {
+    // 	console.log("----------mark geocode")
+    // });
+
+    var geocoder = L.Control.Geocoder.wmoId({
+        collapsed: false,
+        position: "topleft",
+        placeholder: "Search for a location or station id",
+        type: "WmoId",
+	summary: summary,
+	sizeInMeters: 300000
+    });
+
+    bootleaf.leafletGeocoder = L.Control.geocoder({
+        position: "topleft",
+        placeholder: "Search for a location or station id",
+        collapsed: false,
+        geocoder: geocoder,
+	defaultMarkGeocode: false,
+    }).addTo(bootleaf.map).on('markgeocode', function(e) {
+	bootleaf.map.fitBounds(e.geocode.bbox);
+	var sid = e.geocode.properties.station_id;
+	markerGroups.forEach(function(group, index) {
+            var marker;
+            for (var layer of group.getLayers()) {
+		if ((layer instanceof L.CircleMarker)) {
+                    marker = layer;
+                    break;
+		}
+		if ((layer instanceof L.Marker)) {
+                    marker = layer;
+                    break;
+		}
+            };
+            var m = marker.feature.properties.station_id;
+	    if (m == sid) {
+		markerClicked({target: marker});
+	    }
+	});
+
+	
+	// var bbox = e.geocode.bbox;
+	// var poly = L.polygon([
+	//     bbox.getSouthEast(),
+	//     bbox.getNorthEast(),
+	//     bbox.getNorthWest(),
+	//     bbox.getSouthWest()
+	// ]).addTo(bootleaf.map);
+	// bootleaf.map.fitBounds(poly.getBounds());
+    });
     
     markers = L.geoJson(summary, {
         filter: function(f) {

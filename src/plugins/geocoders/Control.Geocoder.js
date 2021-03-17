@@ -665,12 +665,11 @@ var leafletControlGeocoder = (function (L) {
         }
       }
 
-      if (found) {
+      if (found.length > 0) {
         var results = [];
 
         for (var index = 0; index < found.length; index++) {
           var f = found[index];
-          console.log(f, index);
           var center = L.latLng(f.geometry.coordinates[1], f.geometry.coordinates[0], f.geometry.coordinates[2]);
           results[index] = {
             name: f.properties.name + " (wmo " + f.properties.station_id + ")",
