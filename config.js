@@ -22,8 +22,8 @@ var config = {
             //https://github.com/perliedman/leaflet-control-geocoder
             "collapsed": false,
             "position": "topleft",
-            "placeholder": "Search for a location",
-            "type": "OpenStreetMap",
+            "placeholder": "Search for a location or station id",
+            "type": "WmoId",
         },
         "bookmarks": {
             "position": "bottomright",
@@ -111,6 +111,8 @@ var config = {
             ]
         }
     },
+    // "activeTool": "coordinates", // "filterWidget", // options are identify/coordinates/queryWidget
+
     "basemaps": ['OpenStreetMap', 'Aerial'],
     "bing_key": "Ai97yaqNocJJDGpibB4EnQ-0AoEb0prY4jZ3OASp8rf8jHFET_KsVtgGx2MDku6F",
     "projections": [{
