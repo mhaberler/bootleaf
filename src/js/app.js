@@ -529,7 +529,10 @@ function loadMap(){
         geocoder = L.Control.Geocoder.google(config.controls.leafletGeocoder);
       } else if (config.controls.leafletGeocoder.type === "ArcGIS") {
         geocoder = L.Control.Geocoder.arcgis(config.controls.leafletGeocoder);
-      }
+      }  else if (config.controls.leafletGeocoder.type === "WmoId") {
+        geocoder = L.Control.Geocoder.wmoId(config.controls.leafletGeocoder);
+      } 
+
 
       if (config.controls.leafletGeocoder.suffix !== undefined){
         geocoder.suffix = config.controls.leafletGeocoder.suffix;
