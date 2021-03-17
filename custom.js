@@ -607,24 +607,21 @@ function determineHeading(f) {
 }
 
 
-function gotSummary(summary) {
-    // console.log("gotSummary", summary);
+function gotSummary(data) {
+    summary = data;
     summaryFmt = summary.properties.fmt;
     var summaryGenerated = summary.properties.generated;
     var mobileMarkerList = [];
 
-    // bootleaf.leafletGeocoder.options.geocoder.options.summary = summary;
-    // bootleaf.leafletGeocoder.options.geocoder.on('markgeocode', function(e) {
-    // 	console.log("----------mark geocode")
-    // });
-
+    var nominatim = L.Control.Geocoder.nominatim();
     var geocoder = L.Control.Geocoder.wmoId({
-        collapsed: false,
-        position: "topleft",
-        placeholder: "Search for a location or station id",
+        // collapsed: false,
+        // position: "topleft",
+        // placeholder: "Search for a location or station id",
         type: "WmoId",
 	summary: summary,
-	sizeInMeters: 300000
+	sizeInMeters: 300000,
+	next: nominatim
     });
 
     bootleaf.leafletGeocoder = L.Control.geocoder({
@@ -653,16 +650,6 @@ function gotSummary(summary) {
 		markerClicked({target: marker});
 	    }
 	});
-
-	
-	// var bbox = e.geocode.bbox;
-	// var poly = L.polygon([
-	//     bbox.getSouthEast(),
-	//     bbox.getNorthEast(),
-	//     bbox.getNorthWest(),
-	//     bbox.getSouthWest()
-	// ]).addTo(bootleaf.map);
-	// bootleaf.map.fitBounds(poly.getBounds());
     });
     
     markers = L.geoJson(summary, {
