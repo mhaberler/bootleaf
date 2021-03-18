@@ -682,7 +682,18 @@ function gotSummary(data) {
 		    heading: determineHeading(feature),
                     fillOpacity: 1
                 });
-		marker.feature = feature;
+		var lineCoordinate = [];
+		for (var i in feature.properties.ascents) {
+		    var a = feature.properties.ascents[i];
+		    lineCoordinate.push([a.lat, a.lon]);
+
+		}
+		L.polyline(lineCoordinate,{
+		    color: 'black',
+		    weight: 1,
+		    opacity: 0.5,
+		}).addTo(bootleaf.map);
+		//marker.feature = feature;
                 mobileMarkerList.push(marker);
             }
             else {
