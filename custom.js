@@ -172,7 +172,7 @@ function genDetail(fc, container) {
     html += brk;
     var rounded_age = Math.round(((now() - p.syn_timestamp) / 3600)*10)/10;
     html += bold("Synoptic time:   ") + timeString(p.syn_timestamp)
-    + " (" + rounded_age + " hours old)" +  brk;
+	+ " (" + rounded_age + " hours old)" +  brk;
 
     
     if (p.firstSeen)
@@ -190,7 +190,7 @@ function genDetail(fc, container) {
     }
     if (p.processed) {
         html += bold("Online:   ") + timeString(p.processed) +
-        " (" + minsec(p.processed - p.arrived) + " after arrival)" + brk;
+            " (" + minsec(p.processed - p.arrived) + " after arrival)" + brk;
     }
     html += para + bold("Sonde:") + brk;
     if (('sonde_type' in p)   && sondeinfo.sonde_types[p.sonde_type])
@@ -287,10 +287,10 @@ function hotfix(geojson) {
     // fix geojson objects in-place depending on various bug conditions:
 
     var fix_u_v = ((geojson.properties.repfmt === 'fm35') &&
-        (geojson.properties.fmt < 5));
+		   (geojson.properties.fmt < 5));
 
     var fix_pressure = ((geojson.properties.repfmt === 'fm94') &&
-        (geojson.properties.fmt < 2));
+			(geojson.properties.fmt < 2));
 
     // walk the object and apply any fixes known for this version
     for (var i in geojson.features) {
@@ -326,30 +326,28 @@ var skewt = new SkewT('#skew-t');
 
 function loadAscent(url, ascent, completion) {
     $.getJSON(url,
-        (function(a) {
-            return function(geojson) {
-                hotfix(geojson);
-                // add in the station name from stations
-                geojson.properties.station_name = stations[geojson.properties.station_id].properties.name;
-                a.data = geojson;
-                a.data.properties.last_reference = unixTimestamp();
-                completion(geojson);
-                drawpath(geojson);
-            };
-        }(ascent))
-    );
+              (function(a) {
+		  return function(geojson) {
+                      hotfix(geojson);
+                      // add in the station name from stations
+                      geojson.properties.station_name = stations[geojson.properties.station_id].properties.name;
+                      a.data = geojson;
+                      a.data.properties.last_reference = unixTimestamp();
+                      completion(geojson);
+                      drawpath(geojson);
+		  };
+              }(ascent))
+	     );
 }
 
-// 2021-03-03T00:00:00.000Z//
-//29231_2021_03030000Z
 function DownloadFilename(a) {
     var ts = new Date(a.properties.syn_timestamp * 1000).toJSON();
     return (a.properties.station_id + '_' +
-        ts.substring(0, 4) +
-        ts.substring(5, 7) +
-        ts.substring(8, 10) + '_' +
-        ts.substring(11, 13) +
-        ts.substring(14, 16) + 'Z').replace(/-/g, '_');
+            ts.substring(0, 4) +
+            ts.substring(5, 7) +
+            ts.substring(8, 10) + '_' +
+            ts.substring(11, 13) +
+            ts.substring(14, 16) + 'Z').replace(/-/g, '_');
 }
 
 // toJSON: 2021-02-09T15:54:08.639Z
@@ -404,9 +402,9 @@ function populateSidebar(feature, preferBUFR) {
         var doublette = false;
         if (i < (len - 1)) {
             if ((feature.properties.ascents[i].repfmt !=
-                    feature.properties.ascents[i + 1].repfmt) &&
+                 feature.properties.ascents[i + 1].repfmt) &&
                 Math.abs(feature.properties.ascents[i + 1].syn_timestamp -
-                    feature.properties.ascents[i].syn_timestamp) < ascentFuzzValue) {
+			 feature.properties.ascents[i].syn_timestamp) < ascentFuzzValue) {
                 // different sources and two ascents
                 // within the ascentFuzzValue time span found
                 doublette = true;
@@ -415,7 +413,7 @@ function populateSidebar(feature, preferBUFR) {
         if (!preferBUFR || !doublette) {
             // normal case - list them all
             ascentHistory.appendChild(ascentItem(ascent.syn_timestamp,
-                "dropdown-" + ascent.repfmt + "-item", i));
+						 "dropdown-" + ascent.repfmt + "-item", i));
             continue;
         }
         // we preferBUFR
@@ -423,13 +421,13 @@ function populateSidebar(feature, preferBUFR) {
             if (ascent.repfmt == 'fm35') {
                 // add the second one which is the BUFR
                 ascentHistory.appendChild(ascentItem(feature.properties.ascents[i + 1].syn_timestamp,
-                    "dropdown-" + feature.properties.ascents[i + 1].repfmt + "-item", i + 1));
+						     "dropdown-" + feature.properties.ascents[i + 1].repfmt + "-item", i + 1));
                 i += 1;
                 continue;
             }
             // else take the first one
             ascentHistory.appendChild(ascentItem(feature.properties.ascents[i].syn_timestamp,
-                "dropdown-" + feature.properties.ascents[i].repfmt + "-item", i));
+						 "dropdown-" + feature.properties.ascents[i].repfmt + "-item", i));
             // and skip the netcCDF entry
             i += 1;
             continue;
@@ -476,10 +474,10 @@ function dataURI(sid, ascent) {
             sid.substring(0, 2) + "/" +
             sid.substring(2, 5) + "/" +
 
-            ts.substring(0, 4) + "/" +
+        ts.substring(0, 4) + "/" +
             ts.substring(5, 7) + "/" +
 
-            sid + "_" +
+        sid + "_" +
             ts.substring(0, 4) +
             ts.substring(5, 7) +
             ts.substring(8, 10) + "_" +
@@ -490,20 +488,20 @@ function dataURI(sid, ascent) {
     }
     return datapath +
         ascent.repfmt + "/" +
-            sid.substring(0, 2) + "/" +
-            sid.substring(2, 5) + "/" +
+        sid.substring(0, 2) + "/" +
+        sid.substring(2, 5) + "/" +
 
-            ts.substring(0, 4) + "/" +
-            ts.substring(5, 7) + "/" +
+    ts.substring(0, 4) + "/" +
+        ts.substring(5, 7) + "/" +
 
-            sid + "_" +
-            ts.substring(0, 4) +
-            ts.substring(5, 7) +
-            ts.substring(8, 10) + "_" +
-            ts.substring(11, 13) +
-            ts.substring(14, 16) +
-            ts.substring(17, 19) +
-            ".geojson";
+    sid + "_" +
+        ts.substring(0, 4) +
+        ts.substring(5, 7) +
+        ts.substring(8, 10) + "_" +
+        ts.substring(11, 13) +
+        ts.substring(14, 16) +
+        ts.substring(17, 19) +
+        ".geojson";
 }
 
 function plotStation(feature, index) {
@@ -672,26 +670,29 @@ function gotSummary(data) {
 
             if (feature.properties.id_type === "mobile") {
 
-                marker = L.boatMarker(latlng, {
+                marker = L.trackSymbol(latlng, {
                     fillColor: markerColor, // color of the boat
-                    idleCircle: false, // if set to true, the icon will draw a circle if
-                    // boatspeed == 0 and the ship-shape if speed > 0
-                    // className: "context-menu-marker"
-                    className: "zoomable-icon",
+		    weight:  (ascent.repfmt === "fm94") ? 2 : 1,
+		    fill: true,
+          	    stroke: true,
+		    speed: 0.0,
+	            radius: 10,
+                    color: "#000000",
+                    opacity: 1,
+		    heading: determineHeading(feature),
+                    fillOpacity: 1
                 });
+		marker.feature = feature;
                 mobileMarkerList.push(marker);
-                var h = determineHeading(feature);
-                marker.setHeading(h);
-                // console.log("mobile:", feature.properties.name, latlng, h);
             }
             else {
                 marker = L.circleMarker(latlng, {
                     fillColor: markerColor,
                     radius: 10,
                     color: "#000",
-                    weight: 1,
                     opacity: 1,
-                    fillOpacity: 0.8,
+                    fillOpacity:  (ascent.repfmt === "fm94") ? 0.9 : 0.6,
+                    weight:  (ascent.repfmt === "fm94") ? 2 : 1,
                     className: "context-menu-marker"
                 });
             }
@@ -711,15 +712,15 @@ function gotSummary(data) {
                 sid = "station " + feature.properties.station_id + "<br>  ";
             }
             var content = "<b>" + feature.properties.name + "</b>" + appendix + "<br>  " +
-            sid  +
-            rounded_age + " hours old";
+		sid  +
+		rounded_age + " hours old";
             if (isTouchDevice) {
                 marker.on('click', markerClicked);
             }
             else {
                 marker.bindTooltip(content, {
 		    className: "dropdown-" + ascent.repfmt + "-item"
-                    }).openTooltip()
+                }).openTooltip()
                     .on('click', markerClicked);
                 //                        .on('mouseover', mouseover);
             }
@@ -844,26 +845,12 @@ function afterMapLoads() {
         var currentZoom = bootleaf.map.getZoom();
         console.log("zoom=", currentZoom);
 
-        // mobileMarkerList.forEach(function(marker, index) {
-        //     console.log("zooming", marker);
-        // });
-
-        var newzoom = '' + (2 * (currentZoom)) + 'px';
+	var newzoom = '' + (2 * (currentZoom)) + 'px';
         $('#map .zoomable-icon').css({
             'width': newzoom,
             'height': newzoom
         });
-
-
-        // //Update X and Y based on zoom level
-        // var x= 50; //Update x
-        // var y= 50; //Update Y
-        // var LeafIcon = L.Icon.extend({
-        //     options: {
-        //         iconSize:     [x, y] // Change icon size according to zoom level
-        //     }
-        // });
-        // layer.setIcon(LeafIcon);
+	
     });
     $("#loading").hide();
 
@@ -931,7 +918,7 @@ function updateMarkers(agelimit) {
                 marker = layer;
                 break;
             }
-            if ((layer instanceof L.Marker)) {
+            if ((layer instanceof L.TrackSymbol)) {
                 marker = layer;
                 break;
             }
