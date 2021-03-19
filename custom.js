@@ -122,6 +122,8 @@ function minsec(sec) {
 function genDetail(fc, container) {
 
     var p = fc.properties;
+    var lastpt = fc.features[fc.features.length-1];
+    // 
     var para = "<p>";
     var brk = "<br>";
     var detail = document.getElementById(container);
@@ -158,6 +160,8 @@ function genDetail(fc, container) {
         round6(lat) + ns + " " + round6(lon) + ew + " </a>" + brk;
 
     html += bold("elevation:   ") + p.elevation + "m" + brk;
+    html += bold("last recorded height:   ") + Math.round(lastpt.geometry.coordinates[2]) + "m  (" +
+	Math.round(lastpt.properties.pressure) + "hPa)" + brk;
     if (p.text)
         html += bold("text:   ") + p.text + brk;
 
