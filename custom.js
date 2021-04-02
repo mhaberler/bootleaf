@@ -24,6 +24,7 @@ var slowTick, fastTick;
 var slowTickInterval = 900 * 1000; // 15min
 var fastTickInterval = 5 * 1000;
 var maxAge = 3600; //delete ascent.data after an hour
+var brk = "<br>";
 
 
 var markerSelectedColor = "OrangeRed";
@@ -125,7 +126,6 @@ function genDetail(fc, container) {
     var lastpt = fc.features[fc.features.length-1];
     //
     var para = "<p>";
-    var brk = "<br>";
     var detail = document.getElementById(container);
     var html;
     var s = "Station: " + p.station_name;
@@ -732,7 +732,7 @@ function gotSummary(data) {
 		rounded_age + " hours old";
 
             if (feature.properties.sonde_frequency) {
-                content += "<br>  ";
+                content += brk;
                 feature.properties.sonde_frequency.forEach(function(entry, index) {
                     content += round3(entry / 1000) / 1000;
                     if (index < feature.properties.sonde_frequency.length-1) {
@@ -743,12 +743,12 @@ function gotSummary(data) {
             }
             if (feature.properties.sonde_type) {
 
-                content += "<br>  ";
+                content += brk;
 
                 feature.properties.sonde_type.forEach(function(entry, index) {
                     content += sondeinfo.sonde_types[entry] + " ";
                     if (index < feature.properties.sonde_type.length-1) {
-                        content += "<brk>";
+                        content += brk;
                     }
                 });
             }
