@@ -123,7 +123,7 @@ function genDetail(fc, container) {
 
     var p = fc.properties;
     var lastpt = fc.features[fc.features.length-1];
-    // 
+    //
     var para = "<p>";
     var brk = "<br>";
     var detail = document.getElementById(container);
@@ -178,7 +178,7 @@ function genDetail(fc, container) {
     html += bold("Synoptic time:   ") + timeString(p.syn_timestamp)
 	+ " (" + rounded_age + " hours old)" +  brk;
 
-    
+
     if (p.firstSeen)
         html += bold("First seen:   ") + timeString(p.firstSeen) + brk;
     if (p.lastSeen)
@@ -203,6 +203,7 @@ function genDetail(fc, container) {
         html += bold("serial number:   ") + p.sonde_serial + brk;
     if (p.sonde_frequency)
         html += bold("transmit frequency:   ") + round3(p.sonde_frequency / 1000) / 1000 + " MHz" + brk;
+
     if (p.sonde_swversion)
         html += bold("SW version:   ") + p.sonde_swversion + brk;
     if (('sonde_humcorr' in p) && sondeinfo.sonde_humcorr[p.sonde_humcorr])
@@ -224,7 +225,7 @@ function genDetail(fc, container) {
     if (('sonde_term' in p) && sondeinfo.sonde_term[p.sonde_term])
         html += bold("termination reason:   ") + sondeinfo.sonde_term[p.sonde_term] + brk;
 
-    
+
     html += para + bold("Data reference:") + brk;
     if (p.channel)
 	html += bold("source:   ") + p.channel + brk;
@@ -266,7 +267,7 @@ function plotSkewT(geojson) {
     skewt.plot(samples);
     genDetail(geojson, 'detailPane');
     genDownload(geojson);
-    
+
     $('#skew-t').collapse('show')
     $('#detailPane').collapse('hide');
     $("#sidebar").show("slow");
@@ -653,7 +654,7 @@ function gotSummary(data) {
 	    }
 	});
     });
-    
+
     markers = L.geoJson(summary, {
         filter: function(f) {
             if (!f.properties.ascents.length) // no ascents available
@@ -729,6 +730,29 @@ function gotSummary(data) {
             var content = "<b>" + feature.properties.name + "</b>" + appendix + "<br>  " +
 		sid  +
 		rounded_age + " hours old";
+
+            if (feature.properties.sonde_frequency) {
+                content += "<br>  ";
+                feature.properties.sonde_frequency.forEach(function(entry, index) {
+                    content += round3(entry / 1000) / 1000;
+                    if (index < feature.properties.sonde_frequency.length-1) {
+                        content += ", ";
+                    }
+                });
+                content += " MHz";
+            }
+            if (feature.properties.sonde_type) {
+
+                content += "<br>  ";
+
+                feature.properties.sonde_type.forEach(function(entry, index) {
+                    content += sondeinfo.sonde_types[entry] + " ";
+                    if (index < feature.properties.sonde_type.length-1) {
+                        content += "<brk>";
+                    }
+                });
+            }
+
             if (isTouchDevice) {
                 marker.on('click', markerClicked);
             }
@@ -865,7 +889,7 @@ function afterMapLoads() {
             'width': newzoom,
             'height': newzoom
         });
-	
+
     });
     $("#loading").hide();
 
