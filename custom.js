@@ -849,11 +849,25 @@ function closeBookmark(e) {
  * @example
  * var csvString = geojson2dsv(geojsonObject)
  */
+
+function rowconvert(p) {
+    return {
+        time: new Date(p.time * 1000),
+        gpheight: p.gpheight,
+        pressure: p.pressure.toFixed(1),
+        temp: (p.temp - zeroK).toFixed(1),
+        dewpoint: (p.dewpoint - zeroK).toFixed(1),
+        wind_u: p.wind_u.toFixed(2),
+        wind_v: p.wind_v.toFixed(2)
+    }
+    return p;
+}
+
 function geojson2dsv(geojson, delim, mixedGeometry) {
     var rows = normalize(geojson).features
         .map(function(feature) {
             if (feature.geometry && feature.geometry.type === 'Point') {
-                return Object.assign({}, feature.properties, {
+                return Object.assign({}, rowconvert(feature.properties), {
                     lon: feature.geometry.coordinates[0],
                     lat: feature.geometry.coordinates[1],
                     ele: feature.geometry.coordinates[2]
