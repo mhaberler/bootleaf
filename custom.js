@@ -225,6 +225,21 @@ function genDetail(fc, container) {
     if (('sonde_term' in p) && sondeinfo.sonde_term[p.sonde_term])
         html += bold("termination reason:   ") + sondeinfo.sonde_term[p.sonde_term] + brk;
 
+    html += para + bold("Balloon:") + brk;
+    if (('balloon_manufacturer' in p) && (p.balloon_manufacturer in  sondeinfo.balloon_manufacturer))
+        html += bold("Manufacturer:   ") + sondeinfo.balloon_manufacturer[p.balloon_manufacturer] + brk;
+
+   if (('balloon_type' in p) && sondeinfo.balloon_type[p.balloon_type])
+       html += bold("Type:   ") + sondeinfo.balloon_type[p.balloon_type] + brk;
+
+    if ('balloon_weight' in p)
+        html += bold("Weight:   ")  + p.balloon_weight + "kg" + brk;
+
+    if (('gas_type' in p) && sondeinfo.gas_type[p.gas_type])
+        html += bold("Gas:   ") + sondeinfo.gas_type[p.gas_type] + brk;
+
+    if ('gas_weight' in p)
+        html += bold("Gas amount:   ") + p.gas_weight + "kg" + brk;
 
     html += para + bold("Data reference:") + brk;
     if (p.channel)
@@ -248,11 +263,17 @@ function plotSkewT(geojson) {
     var windsamples = 0;
     for (var i in geojson.features) {
         var p = geojson.features[i].properties;
+        // http://bmcnoldy.rsmas.miami.edu/Humidity.html
+        // RH: =100*(EXP((17.625*TD)/(243.04+TD))/EXP((17.625*T)/(243.04+T)))
+        var tC = round3(p['temp'] - zeroK);
+        var dC = round3(p['dewpoint'] - zeroK);
+        // var rhum = 0;
         var sample = {
             "press": round3(p['pressure']),
             "hght": round3(p['gpheight']),
-            "temp": round3(p['temp'] - zeroK),
-            "dwpt": round3(p['dewpoint'] - zeroK),
+            "temp": tC,
+            "dwpt": dC,
+            // "rhum": rhum,
         };
 
         if ((typeof p.wind_u === "undefined") || (typeof p.wind_v === "undefined")) {
