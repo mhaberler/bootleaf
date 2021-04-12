@@ -233,13 +233,14 @@ function genDetail(fc, container) {
        html += bold("Type:   ") + sondeinfo.balloon_type[p.balloon_type] + brk;
 
     if ('balloon_weight' in p)
-        html += bold("Weight:   ")  + p.balloon_weight + "kg" + brk;
+        html += bold("Weight:   ")  +  Math.round(p.balloon_weight*100)/100 + "kg" + brk;
 
     if (('gas_type' in p) && sondeinfo.gas_type[p.gas_type])
         html += bold("Gas:   ") + sondeinfo.gas_type[p.gas_type] + brk;
 
     if ('gas_weight' in p)
-        html += bold("Gas amount:   ") + p.gas_weight + "kg" + brk;
+        html += bold("Gas amount:   ") + Math.round(p.gas_weight*100)/100 + "kg" + brk;
+
 
     html += para + bold("Data reference:") + brk;
     if (p.channel)
