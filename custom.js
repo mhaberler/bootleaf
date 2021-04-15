@@ -768,7 +768,12 @@ function gotSummary(data) {
                 content += brk;
 
                 feature.properties.sonde_type.forEach(function(entry, index) {
-                    content += sondeinfo.sonde_types[entry] + " ";
+                    try {
+                        content += sondeinfo.sonde_types[entry] + " ";
+
+                    } catch (error) {
+                        console.error(error);
+                    }
                     if (index < feature.properties.sonde_type.length-1) {
                         content += brk;
                     }
@@ -819,16 +824,17 @@ function failedInfo(jqXHR, textStatus, err) {
 }
 
 function addMeta() {
-    $.getJSON(summary_url)
-        .done(function(data) {
-            gotSummary(data);
-        })
-        .fail(function(jqXHR, textStatus, err) {
-            failedSummary(jqXHR, textStatus, err);
-        });
+
     $.getJSON(sondeinfo_url)
         .done(function(data) {
             gotInfo(data);
+            $.getJSON(summary_url)
+                .done(function(data) {
+                    gotSummary(data);
+                })
+                .fail(function(jqXHR, textStatus, err) {
+                    failedSummary(jqXHR, textStatus, err);
+                });
         })
         .fail(function(jqXHR, textStatus, err) {
             failedInfo(jqXHR, textStatus, err);
