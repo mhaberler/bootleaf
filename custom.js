@@ -886,9 +886,9 @@ function rowconvert(p) {
         temp: (p.temp - zeroK).toFixed(1),
         dewpoint: (p.dewpoint - zeroK).toFixed(1),
         wind_u: p.wind_u.toFixed(2),
-        wind_v: p.wind_v.toFixed(2)
+        wind_v: p.wind_v.toFixed(2),
+        flags:  'flags' in p ? p.flags : 0
     }
-    return p;
 }
 
 function geojson2dsv(geojson, delim, mixedGeometry) {
