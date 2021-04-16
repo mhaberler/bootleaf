@@ -39,6 +39,28 @@ var path_colors = {
     }
 }
 
+// meaning of bits in "flags" property of a Feature
+// see https://github.com/mhaberler/radiosonde-datacollector/commit/4f13c57b2b801c737c52102c74c3bca5e23fc412
+var levelFlags = {
+    "131072": "surface",
+    "65536": "standard level",
+    "32768": "tropopause level",
+    "16384": "maximum wind level",
+    "8192": "significant temperature level",
+    "4096": "significant humidity level",
+    "2048": "significant wind level",
+    "1024": "beginning of missing temperature data",
+    "512": "end of missing temperature data",
+    "256": "beginning of missing humidity data",
+    "128": "end of missing humidity data",
+    "64": "beginning of missing wind data",
+    "32": "end of missing wind data",
+    "16": "top of wind sounding",
+    "8": "level determined by regional decision",
+    "4": "reserved",
+    "2": "pressure level vertical coordinate"
+};
+
 function unixTimestamp() {
     return Math.round((new Date()).getTime() / 1000);
 }
@@ -276,7 +298,17 @@ function plotSkewT(geojson) {
             "dwpt": dC,
             // "rhum": rhum,
         };
-
+        if (p.flags) {
+            var html = "";
+            for (var i = 0; i < 18; i++ ) {
+                var mask = 1 << i;
+                if ((p.flags & mask) && (mask in levelFlags)) {
+                    html += levelFlags[mask] + brk;
+                }
+            }
+            console.log(sample["hght"], html);
+            sample["tooltip"] = html;
+        }
         if ((typeof p.wind_u === "undefined") || (typeof p.wind_v === "undefined")) {
             samples.push(sample);
             continue;
