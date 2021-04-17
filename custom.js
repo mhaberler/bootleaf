@@ -42,14 +42,14 @@ var path_colors = {
 // meaning of bits in "flags" property of a Feature
 // see https://github.com/mhaberler/radiosonde-datacollector/commit/4f13c57b2b801c737c52102c74c3bca5e23fc412
 var levelFlags = {
-    "524288": "mandatory level", // custom
+    "524288": "mandatory", // custom
     "131072": "surface",
-    "65536": "standard level",
-    "32768": "tropopause level",
-    "16384": "maximum wind level",
-    "8192": "significant temperature level",
-    "4096": "significant humidity level",
-    "2048": "significant wind level",
+    "65536": "standard",
+    "32768": "tropopause",
+    "16384": "maximum wind",
+    "8192": "significant temperature",
+    "4096": "significant humidity",
+    "2048": "significant wind",
     "1024": "beginning of missing temperature data",
     "512": "end of missing temperature data",
     "256": "beginning of missing humidity data",
@@ -92,7 +92,7 @@ function round6(value) {
 // https://stackoverflow.com/questions/19721439/download-json-object-as-a-file-from-browser
 function downloadObjectAs(type, exportObj, exportName) {
     if (type == 'CSV') {
-        var dataStr = "data:text/csv;charset=utf-8," + geojson2dsv(exportObj);
+        var dataStr = "data:text/csv;charset=utf-8," + geojson2dsv(exportObj, ',', true);
         var fn = exportName + ".csv";
     }
     else if (type == 'GeoJSON') {
@@ -901,6 +901,22 @@ function closeBookmark(e) {
     $(".leaflet-popup-close-button")[0].click();
 }
 
+function levelText(flags) {
+    if (flags === "undefined")
+        return "";
+    var text = "";
+    for (var i = 0; i < 24; i++ ) {
+        var mask = 1 << i;
+        if ((flags & mask) && (mask in levelFlags)) {
+            text += levelFlags[mask] + ", ";
+        }
+    }
+    if (text.charAt(text.length-2) == ',') {
+        text = text.slice(0, -2);
+    }
+    return text;
+}
+
 /**
  * Given a valid GeoJSON object, return a CSV composed of all decodable points.
  * @param {Object} geojson any GeoJSON object
@@ -911,28 +927,44 @@ function closeBookmark(e) {
  * var csvString = geojson2dsv(geojsonObject)
  */
 
-function rowconvert(p) {
-    return {
-        time: new Date(p.time * 1000),
-        gpheight: p.gpheight,
+function rowconvert(p, coordinates, gp) {
+    var r =  {
+        time: (p.time === 'undefined') ? new Date(gp.syn_time * 1000) : new Date(p.time * 1000),
+        lon: coordinates[0],
+        lat: coordinates[1],
+        ele: coordinates[2].toFixed(1),
+        gpheight: p.gpheight.toFixed(1),
         pressure: p.pressure.toFixed(1),
-        temp: (p.temp - zeroK).toFixed(1),
-        dewpoint: (p.dewpoint - zeroK).toFixed(1),
-        wind_u: p.wind_u.toFixed(2),
-        wind_v: p.wind_v.toFixed(2),
-        flags:  'flags' in p ? p.flags : 0
+    };
+    if (p.temp) {
+        r.temp = (p.temp - zeroK).toFixed(1);
+    } else {
+        r.temp = "";
     }
+    if (p.dewpoint) {
+        r.dewpoint = (p.dewpoint - zeroK).toFixed(1);
+    } else {
+        r.dewpoint = "";
+    }
+    if (p.wind_u && p.wind_v) {
+        r.wind_u = p.wind_u.toFixed(2);
+        r.wind_v = p.wind_v.toFixed(2);
+    } else {
+        r.wind_u = "";
+        r.wind_v = "";
+    }
+    r.flags = levelText(p.flags);
+    return r;
 }
 
 function geojson2dsv(geojson, delim, mixedGeometry) {
     var rows = normalize(geojson).features
         .map(function(feature) {
             if (feature.geometry && feature.geometry.type === 'Point') {
-                return Object.assign({}, rowconvert(feature.properties), {
-                    lon: feature.geometry.coordinates[0],
-                    lat: feature.geometry.coordinates[1],
-                    ele: feature.geometry.coordinates[2]
-                });
+                return Object.assign({},
+                                     rowconvert(feature.properties,
+                                                feature.geometry.coordinates,
+                                                geojson.properties));
             }
             if (mixedGeometry) {
                 return feature.properties;
