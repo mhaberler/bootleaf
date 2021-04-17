@@ -42,7 +42,6 @@ var path_colors = {
 // meaning of bits in "flags" property of a Feature
 // see https://github.com/mhaberler/radiosonde-datacollector/commit/4f13c57b2b801c737c52102c74c3bca5e23fc412
 var levelFlags = {
-    "524288": "mandatory", // custom
     "131072": "surface",
     "65536": "standard",
     "32768": "tropopause",
