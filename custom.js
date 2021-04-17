@@ -42,6 +42,7 @@ var path_colors = {
 // meaning of bits in "flags" property of a Feature
 // see https://github.com/mhaberler/radiosonde-datacollector/commit/4f13c57b2b801c737c52102c74c3bca5e23fc412
 var levelFlags = {
+    "524288": "mandatory level", // custom
     "131072": "surface",
     "65536": "standard level",
     "32768": "tropopause level",
@@ -300,7 +301,7 @@ function plotSkewT(geojson) {
         };
         if (p.flags) {
             var html = "";
-            for (var i = 0; i < 18; i++ ) {
+            for (var i = 0; i < 24; i++ ) {
                 var mask = 1 << i;
                 if ((p.flags & mask) && (mask in levelFlags)) {
                     html += levelFlags[mask] + brk;
