@@ -929,7 +929,7 @@ function levelText(flags) {
 
 function rowconvert(p, coordinates, gp) {
     var r =  {
-        time: (p.time === 'undefined') ? new Date(gp.syn_time * 1000) : new Date(p.time * 1000),
+        time: (p.time === 'undefined') ? new Date(gp.syn_timestamp * 1000) : new Date(p.time * 1000),
         lon: coordinates[0],
         lat: coordinates[1],
         ele: coordinates[2].toFixed(1),
