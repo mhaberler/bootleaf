@@ -299,6 +299,7 @@ function plotSkewT(geojson) {
             // "rhum": rhum,
         };
         if (p.flags) {
+            sample.flags = p.flags;
             var html = "";
             for (var i = 0; i < 24; i++ ) {
                 var mask = 1 << i;
@@ -663,8 +664,12 @@ function determineHeading(f) {
 
 }
 
+var nFixedStations;
+var nMobileStations;
 
 function gotSummary(data) {
+    nFixedStations = 0;
+    nMobileStations = 0;
     summary = data;
     summaryFmt = summary.properties.fmt;
     var summaryGenerated = summary.properties.generated;
@@ -728,7 +733,7 @@ function gotSummary(data) {
             var marker;
 
             if (feature.properties.id_type === "mobile") {
-
+                nMobileStations += 1;
                 marker = L.trackSymbol(latlng, {
                     fillColor: markerColor, // color of the boat
 		    weight:  (ascent.repfmt === "fm94") ? 2 : 1,
@@ -756,6 +761,8 @@ function gotSummary(data) {
                 mobileMarkerList.push(marker);
             }
             else {
+
+                nFixedStations += 1;
                 marker = L.circleMarker(latlng, {
                     fillColor: markerColor,
                     radius: 10,
@@ -826,6 +833,9 @@ function gotSummary(data) {
         }
     }); // .addTo(bootleaf.map);
     updateMarkers(agelimit);
+
+    console.log("fixed stations", nFixedStations);
+    console.log("mobile stations", nMobileStations);
 
     var station = getURLParameter("station");
     if (station) {
