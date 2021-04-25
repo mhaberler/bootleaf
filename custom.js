@@ -335,8 +335,10 @@ function drawpath(feature) {
 
     for (var i in feature.features) {
         var pointJson = feature.features[i];
-        var coord = pointJson.geometry.coordinates;
-        lineCoordinate.push([coord[1], coord[0]]);
+        if (pointJson.geometry.type === 'Point') {
+            var coord = pointJson.geometry.coordinates;
+            lineCoordinate.push([coord[1], coord[0]]);
+        }
     }
     L.polyline(lineCoordinate, path_colors[path_source]).addTo(bootleaf.map);
 }
