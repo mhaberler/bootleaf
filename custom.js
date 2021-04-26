@@ -177,7 +177,7 @@ function genDetail(fc, container) {
         lon = -p.lon;
     }
     html += bold("location:   ") +
-        "<a targe=\"_blank\" href=\"https://www.google.com/maps/search/?api=1&zoom=12&query=" +
+        "<a target=\"_blank\" href=\"https://www.google.com/maps/search/?api=1&zoom=12&query=" +
         p.lat + "," + p.lon + "\">" +
         round6(lat) + ns + " " + round6(lon) + ew + " </a>" + brk;
 
