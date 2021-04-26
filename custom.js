@@ -145,8 +145,11 @@ function minsec(sec) {
 function genDetail(fc, container) {
 
     var p = fc.properties;
-    var lastpt = fc.features[fc.features.length-1];
-    //
+    var i = fc.features.length-1;
+    while (fc.features[i].geometry.type != 'Point') {
+        i -= 1;
+    }
+    var lastpt = fc.features[i];
     var para = "<p>";
     var detail = document.getElementById(container);
     var html;
