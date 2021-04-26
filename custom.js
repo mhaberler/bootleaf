@@ -269,13 +269,20 @@ function genDetail(fc, container) {
 	html += bold("source:   ") + p.channel + brk;
     html += bold("format:   ") + p.repfmt + "/" + p.encoding + brk;
     if (p.origin_member) {
-        html += bold("source file:  ") +
-            "<a target=\"_blank\" href=\"https://radiosonde.mah.priv.at/source/" +
-            p.origin_member  + "\">" +  p.origin_member + " </a>" + brk;
+        if (p.origin_archive) {
+            html += bold("source file:  ") + p.origin_member + brk;
+        } else {
+            html += bold("source file:  ") +
+                "<a  href=\"https://radiosonde.mah.priv.at/source/" +
+                p.origin_member  + "\">" +  p.origin_member + " </a>" + brk;
+        }
     }
 
-    if (p.origin_archive)
-        html += bold("source archive:   ") + p.origin_archive + brk;
+    if (p.origin_archive) {
+        html += bold("source archive:  ") +
+            "<a  href=\"https://radiosonde.mah.priv.at/source/" +
+            p.origin_archive  + "\">" +  p.origin_archive + " </a>" + brk;
+    }
     if (p.gts_topic)
         html += bold("GTS topic:   ") + p.gts_topic + brk;
     if (p.fmt)
