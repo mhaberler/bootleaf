@@ -1014,7 +1014,7 @@ function afterMapLoads() {
     //var layer = '';//define the layer that contains the markers
     bootleaf.map.on('zoomend', function() {
         var currentZoom = bootleaf.map.getZoom();
-        console.log("zoom=", currentZoom);
+        // console.log("zoom=", currentZoom);
 
 	var newzoom = '' + (2 * (currentZoom)) + 'px';
         $('#map .zoomable-icon').css({
@@ -1023,6 +1023,19 @@ function afterMapLoads() {
         });
 
     });
+
+    L.control.mapCenterCoord({
+        position: 'bottomright',
+        icon: true,
+        onMove: true,
+        template: '{y} {x}', // https://en.wikipedia.org/wiki/ISO_6709
+        projected: false,
+        formatProjected: '#.##0,000',
+        latlngFormat: 'DD', // DD, DM, DMS
+        latlngDesignators: false
+    }).addTo(bootleaf.map);
+
+
     $("#loading").hide();
 
     // start a background task
