@@ -1000,6 +1000,39 @@ function geojson2dsv(geojson, delim, mixedGeometry) {
     return d3.dsvFormat(delim || ',').format(rows);
 }
 
+function radians(n) {
+    return n * (Math.PI / 180);
+}
+
+function degrees(n) {
+    return n * (180 / Math.PI);
+}
+
+function getBearing(startLat,startLong,endLat,endLong){
+    startLat = radians(startLat);
+    startLong = radians(startLong);
+    endLat = radians(endLat);
+    endLong = radians(endLong);
+
+    var dLong = endLong - startLong;
+
+    var dPhi = Math.log(Math.tan(endLat/2.0+Math.PI/4.0)/Math.tan(startLat/2.0+Math.PI/4.0));
+    if (Math.abs(dLong) > Math.PI){
+        if (dLong > 0.0)
+            dLong = -(2.0 * Math.PI - dLong);
+        else
+            dLong = (2.0 * Math.PI + dLong);
+    }
+    return (degrees(Math.atan2(dLong, dPhi)) + 360.0) % 360.0;
+}
+
+function onLocationError(e) {
+    console.log(e.message);
+}
+
+function onLocationFound(e) {
+    console.log("location=", e);
+}
 
 function afterMapLoads() {
 
@@ -1023,6 +1056,22 @@ function afterMapLoads() {
         });
 
     });
+
+
+    bootleaf.map.on('locationfound', onLocationFound);
+    bootleaf.map.on('locationerror', onLocationError);
+
+    // wrap map.locate in a function
+    // function locate() {
+    //   map.locate({setView: true, maxZoom: 16});
+    // }
+
+    // call locate every 3 seconds... forever
+    // setInterval(locate, 3000);
+
+    //    var map =
+    bootleaf.map.locate({setView: false});
+
 
     L.control.mapCenterCoord({
         position: 'bottomright',
